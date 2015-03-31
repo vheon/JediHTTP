@@ -1,12 +1,6 @@
-import sys
 import os
-
-sys.path.insert( 0, os.path.join(
-                        os.path.dirname( os.path.abspath( __file__ ) ),
-                        '..' ) )
-
 from webtest import TestApp
-import handlers
+from .. import handlers
 from nose.tools import ok_
 from hamcrest import ( assert_that, only_contains, all_of, has_key, has_items,
                        has_entry )
