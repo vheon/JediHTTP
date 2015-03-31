@@ -36,7 +36,7 @@ def test_completion():
             'contents': open( filepath ).read()
     }
 
-    completions = app.post_json( '/completion',
+    completions = app.post_json( '/completions',
                                  request_data ).json[ 'completions' ]
 
     assert_that( completions, only_contains( valid_completions() ) )

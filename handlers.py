@@ -12,7 +12,7 @@ def ready():
     return jsonify()
 
 
-@app.route( '/completion', methods=['POST'] )
+@app.route( '/completions', methods=['POST'] )
 def completion():
     script = _GetJediScript( request.get_json() )
     return jsonify( {
