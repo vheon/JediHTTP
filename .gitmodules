@@ -1,27 +1,6 @@
 [submodule "third_party/jedi"]
 	path = third_party/jedi
 	url = https://github.com/davidhalter/jedi
-[submodule "third_party/flask"]
-	path = third_party/flask
-	url = https://github.com/mitsuhiko/flask
 [submodule "third_party/bottle"]
 	path = third_party/bottle
 	url = https://github.com/bottlepy/bottle
-[submodule "werkzeug"]
-	path = third_party/werkzeug
-	url = https://github.com/mitsuhiko/werkzeug
-[submodule "third_party/werkzeug"]
-	path = third_party/werkzeug
-	url = https://github.com/mitsuhiko/werkzeug
-[submodule "third_party/jinja2"]
-	path = third_party/jinja2
-	url = https://github.com/mitsuhiko/jinja2
-[submodule "third_party/markupsafe"]
-	path = third_party/markupsafe
-	url = https://github.com/mitsuhiko/markupsafe
-[submodule "third_party/itsdangerous"]
-	path = third_party/itsdangerous
-	url = https://github.com/mitsuhiko/itsdangerous
-[submodule "third_party/click"]
-	path = third_party/click
-	url = https://github.com/mitsuhiko/click
