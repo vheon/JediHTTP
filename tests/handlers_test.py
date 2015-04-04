@@ -7,6 +7,11 @@ from hamcrest import ( assert_that, only_contains, all_of, has_key, has_item,
                        has_items, has_entry )
 
 
+def fixture_filepath( filename ):
+    dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
+    return os.path.join( dir_of_current_script, 'fixtures', filename )
+
+
 def CompletionEntry( name ):
     return has_entry( 'name', name )
 
@@ -29,8 +34,7 @@ def test_ready():
 
 def test_completion():
     app = TestApp( handlers.app )
-    dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-    filepath = os.path.join( dir_of_current_script, 'fixtures', 'basic.py' )
+    filepath = fixture_filepath( 'basic.py' )
     request_data = {
             'filepath': filepath,
             'line_num': 7,
