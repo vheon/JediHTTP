@@ -3,7 +3,9 @@ from webtest import TestApp
 from .. import handlers
 from nose.tools import ok_
 from hamcrest import ( assert_that, only_contains, all_of, has_key, has_items,
-                       has_entry )
+from hamcrest import ( assert_that, only_contains, all_of, has_key, has_item,
+                       has_items, has_entry )
+
 
 def CompletionEntry( name ):
     return has_entry( 'name', name )
