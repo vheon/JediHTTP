@@ -5,4 +5,5 @@ python:
 before_install: git submodule update --init --recursive
 install: pip install -r test_requirements.txt
 script: nosetests
-
+notifications:
+  email: false
