@@ -6,29 +6,31 @@ for folder in os.listdir( third_party_dir ):
     sys.path.insert( 0, os.path.realpath( os.path.join( third_party_dir,
                                                         folder ) ) )
 
-from flask import Flask, jsonify, request
+import bottle
+from bottle import response, request
+import json
 import jedi
 
 
-app = Flask( __name__ )
+app = bottle.Bottle( __name__ )
 
 
-@app.route( '/healthy' )
+@app.get( '/healthy' )
 def healthy():
-    return jsonify()
+    return _Json({})
 
 
-@app.route( '/ready' )
+@app.get( '/ready' )
 def ready():
-    return jsonify()
+    return _Json({})
 
 
-@app.route( '/completions', methods=['POST'] )
+@app.post( '/completions' )
 def completion():
-    script = _GetJediScript( request.get_json() )
-    return jsonify( {
-        'completions': [
-            {
+    script = _GetJediScript( request.json )
+    return _Json(
+        {
+            'completions': [ {
                 'name':        completion.name,
                 'description': completion.description,
                 'docstring':   completion.docstring()
@@ -43,3 +45,8 @@ def _GetJediScript( request_data ):
     column   = request_data[ 'column_num' ]
 
     return jedi.Script( contents, line, column, filename )
+
+
+def _Json( data ):
+    response.content_type = 'application/json'
+    return json.dumps( data )

@@ -2,9 +2,11 @@ import os
 from webtest import TestApp
 from .. import handlers
 from nose.tools import ok_
-from hamcrest import ( assert_that, only_contains, all_of, has_key, has_items,
 from hamcrest import ( assert_that, only_contains, all_of, has_key, has_item,
                        has_items, has_entry )
+
+import bottle
+bottle.debug( True )
 
 
 def fixture_filepath( filename ):
