@@ -1,12 +1,17 @@
 import os
+import sys
 from webtest import TestApp
 from .. import handlers
 from nose.tools import ok_
-from hamcrest import ( assert_that, only_contains, all_of, has_key, has_item,
-                       has_items, has_entry )
+from unittest import SkipTest, skipIf
+from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
+                       has_item, has_items, has_entry )
 
 import bottle
 bottle.debug( True )
+
+
+py3only = skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
 
 
 def fixture_filepath( filename ):
@@ -50,3 +55,21 @@ def test_completion():
     assert_that( completions, only_contains( valid_completions() ) )
     assert_that( completions, has_items( CompletionEntry( 'a' ),
                                          CompletionEntry( 'b' ) ) )
+
+
+@py3only
+def test_py3():
+    app = TestApp( handlers.app )
+    filepath = fixture_filepath( 'py3.py' )
+    request_data = {
+            'filepath': filepath,
+            'line_num': 7,
+            'column_num': 11,
+            'contents': open( filepath ).read()
+    }
+
+    completions = app.post_json( '/completions',
+                                 request_data ).json[ 'completions' ]
+
+    assert_that( completions, has_item( CompletionEntry( 'values' ) ) )
+    assert_that( completions, is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
