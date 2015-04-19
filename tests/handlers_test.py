@@ -15,61 +15,61 @@ py3only = skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
 
 
 def fixture_filepath( filename ):
-    dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-    return os.path.join( dir_of_current_script, 'fixtures', filename )
+  dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
+  return os.path.join( dir_of_current_script, 'fixtures', filename )
 
 
 def CompletionEntry( name ):
-    return has_entry( 'name', name )
+  return has_entry( 'name', name )
 
 
 def valid_completions():
-    return all_of( has_key( 'docstring' ),
-                   has_key( 'name' ),
-                   has_key( 'description' ) )
+  return all_of( has_key( 'docstring' ),
+                 has_key( 'name' ),
+                 has_key( 'description' ) )
 
 
 def test_healthy():
-    app = TestApp( handlers.app )
-    ok_( app.get( '/healthy' ) )
+  app = TestApp( handlers.app )
+  ok_( app.get( '/healthy' ) )
 
 
 def test_ready():
-    app = TestApp( handlers.app )
-    ok_( app.get( '/ready' ) )
+  app = TestApp( handlers.app )
+  ok_( app.get( '/ready' ) )
 
 
 def test_completion():
-    app = TestApp( handlers.app )
-    filepath = fixture_filepath( 'basic.py' )
-    request_data = {
-            'filepath': filepath,
-            'line_num': 7,
-            'column_num': 2,
-            'contents': open( filepath ).read()
-    }
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'basic.py' )
+  request_data = {
+      'filepath': filepath,
+      'line_num': 7,
+      'column_num': 2,
+      'contents': open( filepath ).read()
+  }
 
-    completions = app.post_json( '/completions',
-                                 request_data ).json[ 'completions' ]
+  completions = app.post_json( '/completions',
+                               request_data ).json[ 'completions' ]
 
-    assert_that( completions, only_contains( valid_completions() ) )
-    assert_that( completions, has_items( CompletionEntry( 'a' ),
-                                         CompletionEntry( 'b' ) ) )
+  assert_that( completions, only_contains( valid_completions() ) )
+  assert_that( completions, has_items( CompletionEntry( 'a' ),
+                                       CompletionEntry( 'b' ) ) )
 
 
 @py3only
 def test_py3():
-    app = TestApp( handlers.app )
-    filepath = fixture_filepath( 'py3.py' )
-    request_data = {
-            'filepath': filepath,
-            'line_num': 7,
-            'column_num': 11,
-            'contents': open( filepath ).read()
-    }
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'py3.py' )
+  request_data = {
+      'filepath': filepath,
+      'line_num': 7,
+      'column_num': 11,
+      'contents': open( filepath ).read()
+  }
 
-    completions = app.post_json( '/completions',
-                                 request_data ).json[ 'completions' ]
+  completions = app.post_json( '/completions',
+                                request_data ).json[ 'completions' ]
 
-    assert_that( completions, has_item( CompletionEntry( 'values' ) ) )
-    assert_that( completions, is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
+  assert_that( completions, has_item( CompletionEntry( 'values' ) ) )
+  assert_that( completions, is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
