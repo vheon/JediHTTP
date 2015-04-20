@@ -1,9 +1,13 @@
 language: python
-python:
-  - "3.3"
-  - "2.7"
-before_install: git submodule update --init --recursive
-install: pip install -r test_requirements.txt
-script: nosetests
+python: 2.7
+env:
+  - TOX_ENV=py27
+  - TOX_ENV=py33
+before_install:
+  - git submodule update --init --recursive
+install:
+  - pip install tox
+script:
+  - tox -e $TOX_ENV
 notifications:
   email: false
