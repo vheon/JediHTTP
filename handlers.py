@@ -1,10 +1,5 @@
-import os
-import sys
-
-third_party_dir = os.path.join( os.path.dirname( __file__ ), 'third_party' )
-for folder in os.listdir( third_party_dir ):
-  sys.path.insert( 0, os.path.realpath( os.path.join( third_party_dir,
-                                                      folder ) ) )
+import utils
+utils.AddThirdPartyFolderToSysPath()
 
 import bottle
 from bottle import response, request
