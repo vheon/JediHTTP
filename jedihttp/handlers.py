@@ -1,6 +1,3 @@
-from jedihttp import utils
-utils.AddThirdPartyFolderToSysPath()
-
 import bottle
 from bottle import response, request
 import json

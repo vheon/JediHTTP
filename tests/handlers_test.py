@@ -1,3 +1,6 @@
+from jedihttp import utils
+utils.AddThirdPartyFolderToSysPath()
+
 import os
 import sys
 from webtest import TestApp
