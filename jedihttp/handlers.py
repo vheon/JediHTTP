@@ -1,4 +1,4 @@
-import utils
+from jedihttp import utils
 utils.AddThirdPartyFolderToSysPath()
 
 import bottle

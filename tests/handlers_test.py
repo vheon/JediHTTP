@@ -1,7 +1,7 @@
 import os
 import sys
 from webtest import TestApp
-from .. import handlers
+from jedihttp import handlers
 from nose.tools import ok_
 from unittest import SkipTest, skipIf
 from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
