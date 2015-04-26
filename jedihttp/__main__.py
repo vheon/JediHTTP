@@ -7,8 +7,6 @@ import handlers
 
 def ParseArgs():
   parser = argparse.ArgumentParser()
-  parser.add_argument( '--host', type = str, default = '127.0.0.1',
-                       help = 'server hostname')
   parser.add_argument( '--port', type = int, default = 0,
                        help = 'server port')
 
@@ -18,7 +16,7 @@ def ParseArgs():
 def Main():
   args = ParseArgs()
   waitress.serve( handlers.app,
-                  host = args.host,
+                  host = '127.0.0.1'
                   port = args.port )
 
 if __name__ == "__main__":
