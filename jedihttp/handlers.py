@@ -31,12 +31,12 @@ def completion():
 
 
 def _GetJediScript( request_data ):
-  filename = request_data[ 'filepath' ]
-  contents = request_data[ 'contents' ]
-  line     = request_data[ 'line_num' ]
-  column   = request_data[ 'column_num' ]
+  source = request_data[ 'source' ]
+  line   = request_data[ 'line' ]
+  col    = request_data[ 'col' ]
+  path   = request_data[ 'path' ]
 
-  return jedi.Script( contents, line, column, filename )
+  return jedi.Script( source, line, col, path )
 
 
 def _Json( data ):

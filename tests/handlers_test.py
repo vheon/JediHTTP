@@ -46,10 +46,10 @@ def test_completion():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'basic.py' )
   request_data = {
-      'filepath': filepath,
-      'line_num': 7,
-      'column_num': 2,
-      'contents': open( filepath ).read()
+      'source': open( filepath ).read(),
+      'line': 7,
+      'col': 2,
+      'path': filepath
   }
 
   completions = app.post_json( '/completions',
@@ -65,10 +65,10 @@ def test_py3():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'py3.py' )
   request_data = {
-      'filepath': filepath,
-      'line_num': 7,
-      'column_num': 11,
-      'contents': open( filepath ).read()
+      'source': open( filepath ).read(),
+      'line': 7,
+      'col': 11,
+      'path': filepath
   }
 
   completions = app.post_json( '/completions',
