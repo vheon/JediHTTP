@@ -1,9 +1,9 @@
-[submodule "third_party/jedi"]
-	path = third_party/jedi
-	url = https://github.com/davidhalter/jedi
-[submodule "third_party/bottle"]
-	path = third_party/bottle
-	url = https://github.com/bottlepy/bottle
-[submodule "third_party/waitress"]
-	path = third_party/waitress
+[submodule "vendor/waitress"]
+	path = vendor/waitress
 	url = https://github.com/Pylons/waitress
+[submodule "vendor/jedi"]
+	path = vendor/jedi
+	url = https://github.com/davidhalter/jedi
+[submodule "vendor/bottle"]
+	path = vendor/bottle
+	url = https://github.com/bottlepy/bottle

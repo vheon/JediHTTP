@@ -1,5 +1,5 @@
 from jedihttp import utils
-utils.AddThirdPartyFolderToSysPath()
+utils.AddVendorFolderToSysPath()
 
 import os
 import sys

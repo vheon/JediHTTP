@@ -1,5 +1,5 @@
 import utils
-utils.AddThirdPartyFolderToSysPath()
+utils.AddVendorFolderToSysPath()
 
 import argparse
 import waitress
