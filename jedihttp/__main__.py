@@ -16,7 +16,7 @@ def ParseArgs():
 def Main():
   args = ParseArgs()
   waitress.serve( handlers.app,
-                  host = '127.0.0.1'
+                  host = '127.0.0.1',
                   port = args.port )
 
 if __name__ == "__main__":
