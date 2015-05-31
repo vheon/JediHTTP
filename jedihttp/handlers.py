@@ -2,9 +2,11 @@ import bottle
 from bottle import response, request
 import json
 import jedi
+import logging
 
 
 app = bottle.Bottle( __name__ )
+logger = logging.getLogger( __name__ )
 
 
 @app.get( '/healthy' )
@@ -19,6 +21,7 @@ def ready():
 
 @app.post( '/completions' )
 def completion():
+  logger.info( 'received /completions request' )
   script = _GetJediScript( request.json )
   return _Json(
       {
