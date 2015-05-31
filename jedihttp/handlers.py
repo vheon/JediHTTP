@@ -28,7 +28,10 @@ def completion():
         'completions': [ {
           'name':        completion.name,
           'description': completion.description,
-          'docstring':   completion.docstring()
+          'docstring':   completion.docstring(),
+          'module_path': completion.module_path,
+          'line':        completion.line,
+          'column':      completion.column
         } for completion in script.completions() ]
       } )
 
