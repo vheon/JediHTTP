@@ -9,12 +9,12 @@ app = bottle.Bottle( __name__ )
 logger = logging.getLogger( __name__ )
 
 
-@app.get( '/healthy' )
+@app.post( '/healthy' )
 def healthy():
   return _Json({})
 
 
-@app.get( '/ready' )
+@app.post( '/ready' )
 def ready():
   return _Json({})
 
