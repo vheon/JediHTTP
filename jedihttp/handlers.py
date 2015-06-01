@@ -65,6 +65,29 @@ def gotodefinition():
         }, status = 404 )
 
 
+@app.post( '/gotoassignment' )
+def gotodeclaration():
+  logger.info( 'received /gotoassignment request' )
+  try:
+    script = _GetJediScript( request.json )
+    return _Json(
+        {
+          'definitions': [ {
+            'module_path': definition.module_path,
+            'line': definition.line,
+            'column': definition.column,
+            'in_builtin_module': definition.in_builtin_module(),
+            'is_keyword': definition.is_keyword,
+            'description': definition.description
+          } for definition in script.goto_assignments() ]
+        } )
+  except Exception as e:
+    return _Json(
+        {
+          'message': str( e )
+        }, status = 404 )
+
+
 def _GetJediScript( request_data ):
   try:
     source = request_data[ 'source' ]

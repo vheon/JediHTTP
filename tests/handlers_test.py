@@ -107,6 +107,30 @@ def test_bad_gotodefinitions():
   assert_that( response.status_int, equal_to( 404 ) )
 
 
+def test_good_gotoassignment():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'goto.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 17,
+      'col': 1,
+      'path': filepath
+  }
+
+  definitions = app.post_json( '/gotoassignment',
+                              request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 1 ) )
+  assert_that( definitions, has_item( {
+                                'in_builtin_module': False,
+                                'is_keyword': False,
+                                'module_path': filepath,
+                                'column': 0,
+                                'line': 15,
+                                'description': 'inception = _list[ 2 ]'
+                            } ) )
+
+
 @py3only
 def test_py3():
   app = TestApp( handlers.app )
