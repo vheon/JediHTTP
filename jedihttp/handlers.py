@@ -47,7 +47,6 @@ def gotodefinition():
   try:
     logger.info( 'received /gotodefinition request' )
     script = _GetJediScript( request.json )
-    logger.info( 'got jedi script' )
     return _Json(
         {
           'definitions': [ {
