@@ -11,12 +11,12 @@ logger = logging.getLogger( __name__ )
 
 @app.post( '/healthy' )
 def healthy():
-  return _Json({})
+  return _Json({'healthy': True})
 
 
 @app.post( '/ready' )
 def ready():
-  return _Json({})
+  return _Json({'ready': True})
 
 
 @app.post( '/completions' )
