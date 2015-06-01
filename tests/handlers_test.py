@@ -8,7 +8,7 @@ from jedihttp import handlers
 from nose.tools import ok_
 from unittest import SkipTest, skipIf
 from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
-                       has_item, has_items, has_entry )
+                       has_item, has_items, has_entry, has_length, equal_to )
 
 import bottle
 bottle.debug( True )
@@ -58,6 +58,53 @@ def test_completion():
   assert_that( completions, only_contains( valid_completions() ) )
   assert_that( completions, has_items( CompletionEntry( 'a' ),
                                        CompletionEntry( 'b' ) ) )
+
+
+def test_good_gotodefinition():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'goto.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 7,
+      'col': 3,
+      'path': filepath
+  }
+
+  definitions = app.post_json( '/gotodefinition',
+                              request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 2 ) )
+  assert_that( definitions, has_items(
+                              {
+                                'description': 'def f',
+                                'line': 1,
+                                'in_builtin_module': False,
+                                'column': 4,
+                                'is_keyword': False,
+                                'module_path': filepath
+                              },
+                              {
+                                'description': 'class C',
+                                'line': 4,
+                                'in_builtin_module': False,
+                                'column': 6,
+                                'is_keyword': False,
+                                'module_path': filepath
+                              } ) )
+
+
+def test_bad_gotodefinitions():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'goto.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 6,
+      'col': 1,
+      'path': filepath
+  }
+
+  response = app.post_json( '/gotodefinition', request_data, status = 404 )
+  assert_that( response.status_int, equal_to( 404 ) )
 
 
 @py3only
