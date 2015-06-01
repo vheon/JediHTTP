@@ -34,12 +34,12 @@ def valid_completions():
 
 def test_healthy():
   app = TestApp( handlers.app )
-  ok_( app.get( '/healthy' ) )
+  ok_( app.post( '/healthy' ) )
 
 
 def test_ready():
   app = TestApp( handlers.app )
-  ok_( app.get( '/ready' ) )
+  ok_( app.post( '/ready' ) )
 
 
 def test_completion():
