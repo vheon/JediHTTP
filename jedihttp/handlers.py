@@ -21,30 +21,40 @@ def ready():
 
 @app.post( '/completions' )
 def completion():
-  logger.info( 'received /completions request' )
-  script = _GetJediScript( request.json )
-  return _Json(
-      {
-        'completions': [ {
-          'name':        completion.name,
-          'description': completion.description,
-          'docstring':   completion.docstring(),
-          'module_path': completion.module_path,
-          'line':        completion.line,
-          'column':      completion.column
-        } for completion in script.completions() ]
-      } )
+  try:
+    logger.info( 'received /completions request' )
+    script = _GetJediScript( request.json )
+    return _Json(
+        {
+          'completions': [ {
+            'name':        completion.name,
+            'description': completion.description,
+            'docstring':   completion.docstring(),
+            'module_path': completion.module_path,
+            'line':        completion.line,
+            'column':      completion.column
+          } for completion in script.completions() ]
+        } )
+  except Exception as e:
+    return _Json(
+        {
+          'message': str( e )
+        }, status = 404 )
 
 
 def _GetJediScript( request_data ):
-  source = request_data[ 'source' ]
-  line   = request_data[ 'line' ]
-  col    = request_data[ 'col' ]
-  path   = request_data[ 'path' ]
+  try:
+    source = request_data[ 'source' ]
+    line   = request_data[ 'line' ]
+    col    = request_data[ 'col' ]
+    path   = request_data[ 'path' ]
 
-  return jedi.Script( source, line, col, path )
+    return jedi.Script( source, line, col, path )
+  except:
+    raise
 
 
-def _Json( data ):
+def _Json( data, status = 200 ):
   response.content_type = 'application/json'
+  response.status = status
   return json.dumps( data )
