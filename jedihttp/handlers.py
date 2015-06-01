@@ -36,9 +36,11 @@ def completion():
           } for completion in script.completions() ]
         } )
   except Exception as e:
+    message = str( e )
+    logger.info( 'Exception in /completions: {0}'.format( message ) )
     return _Json(
         {
-          'message': str( e )
+          'message': message
         }, status = 404 )
 
 
@@ -59,9 +61,11 @@ def gotodefinition():
           } for definition in script.goto_definitions() ]
         } )
   except Exception as e:
+    message = str( e )
+    logger.info( 'Exception in /gotodefinition: {0}'.format( message ) )
     return _Json(
         {
-          'message': str( e )
+          'message': message
         }, status = 404 )
 
 
@@ -82,9 +86,11 @@ def gotodeclaration():
           } for definition in script.goto_assignments() ]
         } )
   except Exception as e:
+    message = str( e )
+    logger.info( 'Exception in /gotoassignment: {0}'.format( message ) )
     return _Json(
         {
-          'message': str( e )
+          'message': message
         }, status = 404 )
 
 
