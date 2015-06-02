@@ -1,5 +1,5 @@
 import bottle
-from bottle import response, request
+from bottle import response, request, error
 import json
 import jedi
 import logging
@@ -58,7 +58,7 @@ def gotodefinition():
   except Exception as e:
     message = str( e )
     logger.info( 'Exception in /gotodefinition: {0}'.format( message ) )
-    return bottle.HTTPError( 500, exception = e )
+    return bottle.HTTPError( 500, message, e )
 
 
 @app.post( '/gotoassignment' )
@@ -80,6 +80,11 @@ def gotoassignments():
     message = str( e )
     logger.info( 'Exception in /gotoassignment: {0}'.format( message ) )
     return bottle.HTTPError( 500, message, e )
+
+
+@app.error()
+def error( err ):
+  return err.body
 
 
 def _GetJediScript( request_data ):
