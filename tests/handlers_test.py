@@ -103,8 +103,8 @@ def test_bad_gotodefinitions():
       'path': filepath
   }
 
-  response = app.post_json( '/gotodefinition', request_data, status = 404 )
-  assert_that( response.status_int, equal_to( 404 ) )
+  response = app.post_json( '/gotodefinition', request_data, status = 500 )
+  assert_that( response.status_int, equal_to( 500 ) )
 
 
 def test_good_gotoassignment():
