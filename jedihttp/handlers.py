@@ -37,7 +37,7 @@ def completion():
   except Exception as e:
     message = str( e )
     logger.info( 'Exception in /completions: {0}'.format( message ) )
-    raise bottle.HTTPError( 500, message, e )
+    return bottle.HTTPError( 500, message, e )
 
 
 @app.post( '/gotodefinition' )
@@ -58,7 +58,7 @@ def gotodefinition():
   except Exception as e:
     message = str( e )
     logger.info( 'Exception in /gotodefinition: {0}'.format( message ) )
-    raise bottle.HTTPError( 500, exception = e )
+    return bottle.HTTPError( 500, exception = e )
 
 
 @app.post( '/gotoassignment' )
@@ -79,7 +79,7 @@ def gotoassignments():
   except Exception as e:
     message = str( e )
     logger.info( 'Exception in /gotoassignment: {0}'.format( message ) )
-    raise bottle.HTTPError( 500, message, e )
+    return bottle.HTTPError( 500, message, e )
 
 
 def _GetJediScript( request_data ):
