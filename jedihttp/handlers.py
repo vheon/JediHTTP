@@ -65,7 +65,8 @@ def gotodefinition():
                'column': definition.column,
                'in_builtin_module': definition.in_builtin_module(),
                'is_keyword': definition.is_keyword,
-               'description': definition.description
+               'description': definition.description,
+               'docstring': definition.docstring()
              } for definition in script.goto_definitions() ]
            }
   except Exception as e:
@@ -86,7 +87,8 @@ def gotoassignments():
                'column': definition.column,
                'in_builtin_module': definition.in_builtin_module(),
                'is_keyword': definition.is_keyword,
-               'description': definition.description
+               'description': definition.description,
+               'docstring': definition.docstring()
              } for definition in script.goto_assignments() ]
            }
   except Exception as e:

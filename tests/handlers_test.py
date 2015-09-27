@@ -78,7 +78,7 @@ def test_good_gotodefinition():
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
       'source': open( filepath ).read(),
-      'line': 7,
+      'line': 10,
       'col': 3,
       'path': filepath
   }
@@ -94,15 +94,17 @@ def test_good_gotodefinition():
                                 'in_builtin_module': False,
                                 'column': 4,
                                 'is_keyword': False,
-                                'module_path': filepath
+                                'module_path': filepath,
+                                'docstring': 'f()\n\nModule method docs\nAre dedented, like you might expect'
                               },
                               {
                                 'description': 'class C',
-                                'line': 4,
+                                'line': 6,
                                 'in_builtin_module': False,
                                 'column': 6,
                                 'is_keyword': False,
-                                'module_path': filepath
+                                'module_path': filepath,
+                                'docstring': 'Class Documentation'
                               } ) )
 
 
@@ -111,7 +113,7 @@ def test_bad_gotodefinitions():
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
       'source': open( filepath ).read(),
-      'line': 6,
+      'line': 9,
       'col': 1,
       'path': filepath
   }
@@ -125,7 +127,7 @@ def test_good_gotoassignment():
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
       'source': open( filepath ).read(),
-      'line': 17,
+      'line': 20,
       'col': 1,
       'path': filepath
   }
@@ -139,8 +141,9 @@ def test_good_gotoassignment():
                                 'is_keyword': False,
                                 'module_path': filepath,
                                 'column': 0,
-                                'line': 15,
-                                'description': 'inception = _list[ 2 ]'
+                                'line': 18,
+                                'description': 'inception = _list[ 2 ]',
+                                'docstring': ''
                             } ) )
 
 

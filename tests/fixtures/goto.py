@@ -1,7 +1,10 @@
 def f():
+  """ Module method docs
+      Are dedented, like you might expect"""
   pass
 
 class C:
+  """ Class Documentation"""
   pass
 
 variable = f if random.choice( [ 0, 1 ] ) else C
