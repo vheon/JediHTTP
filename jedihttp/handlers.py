@@ -77,8 +77,8 @@ def gotodefinition():
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
-  logger.info( 'received /gotoassignment request' )
   try:
+    logger.info( 'received /gotoassignment request' )
     script = _GetJediScript( request.json )
     return {
              'definitions': [ {
