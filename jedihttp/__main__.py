@@ -17,6 +17,7 @@ utils.AddVendorFolderToSysPath()
 import argparse
 import waitress
 import handlers
+from hmac_plugin import HmacPlugin
 
 
 def ParseArgs():
@@ -30,6 +31,8 @@ def ParseArgs():
 
 def Main():
   args = ParseArgs()
+
+  handlers.app.install( HmacPlugin( '' ) )
   waitress.serve( handlers.app,
                   host = args.host,
                   port = args.port )
