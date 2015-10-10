@@ -6,11 +6,8 @@ env:
   - TOX_ENV=py26
   - TOX_ENV=py27
   - TOX_ENV=py33
-before_install:
-  - git submodule update --init --recursive
-install:
-  - flake8 --select=F,C9 --max-complexity=10 --exclude=fixtures jedihttp tests
-  - pip install tox
+before_install: git submodule update --init --recursive
+install: pip install tox
 script: tox -e $TOX_ENV
 notifications:
   email: false
