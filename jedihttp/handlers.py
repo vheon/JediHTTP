@@ -11,9 +11,7 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import bottle
-from bottle import response, request, error
-import json
+from bottle import response, request, error, Bottle
 import jedi
 import logging
 from jedihttp.logger_plugin import LoggerPlugin
@@ -21,7 +19,7 @@ from jedihttp.exception_plugin import ExceptionPlugin
 
 
 logger = logging.getLogger( __name__ )
-app = bottle.Bottle( __name__ )
+app = Bottle( __name__ )
 app.install( LoggerPlugin( logger ) )
 app.install( ExceptionPlugin( logger ) )
 
