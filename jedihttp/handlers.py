@@ -52,6 +52,16 @@ def completions():
 @app.post( '/gotodefinition' )
 def gotodefinition():
   script = _GetJediScript( request.json )
+  return _FormatGoToDefinitions( script.goto_definitions() )
+
+
+@app.post( '/gotoassignment' )
+def gotoassignments():
+  script = _GetJediScript( request.json )
+  return _FormatGoToDefinitions( script.goto_assignments() )
+
+
+def _FormatGoToDefinitions( definitions ):
   return {
             'definitions': [ {
               'module_path':       definition.module_path,
@@ -61,23 +71,7 @@ def gotodefinition():
               'is_keyword':        definition.is_keyword,
               'description':       definition.description,
               'docstring':         definition.docstring()
-            } for definition in script.goto_definitions() ]
-          }
-
-
-@app.post( '/gotoassignment' )
-def gotoassignments():
-  script = _GetJediScript( request.json )
-  return {
-            'definitions': [ {
-              'module_path': definition.module_path,
-              'line': definition.line,
-              'column': definition.column,
-              'in_builtin_module': definition.in_builtin_module(),
-              'is_keyword': definition.is_keyword,
-              'description': definition.description,
-              'docstring': definition.docstring()
-            } for definition in script.goto_assignments() ]
+            } for definition in definitions ]
           }
 
 
