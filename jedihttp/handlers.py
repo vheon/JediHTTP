@@ -35,7 +35,7 @@ def ready():
 @app.post( '/completions' )
 def completions():
   try:
-    logger.info( 'received /completions request' )
+    logger.debug( 'received /completions request' )
     script = _GetJediScript( request.json )
     return {
              'completions': [ {
@@ -49,14 +49,14 @@ def completions():
            }
   except Exception as e:
     message = str( e )
-    logger.info( 'Exception in /completions: {0}'.format( message ) )
+    logger.debug( 'Exception in /completions: {0}'.format( message ) )
     return bottle.HTTPError( 500, message, e )
 
 
 @app.post( '/gotodefinition' )
 def gotodefinition():
   try:
-    logger.info( 'received /gotodefinition request' )
+    logger.debug( 'received /gotodefinition request' )
     script = _GetJediScript( request.json )
     return {
              'definitions': [ {
@@ -71,14 +71,14 @@ def gotodefinition():
            }
   except Exception as e:
     message = str( e )
-    logger.info( 'Exception in /gotodefinition: {0}'.format( message ) )
+    logger.debug( 'Exception in /gotodefinition: {0}'.format( message ) )
     return bottle.HTTPError( 500, message, e )
 
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
   try:
-    logger.info( 'received /gotoassignment request' )
+    logger.debug( 'received /gotoassignment request' )
     script = _GetJediScript( request.json )
     return {
              'definitions': [ {
@@ -93,7 +93,7 @@ def gotoassignments():
            }
   except Exception as e:
     message = str( e )
-    logger.info( 'Exception in /gotoassignment: {0}'.format( message ) )
+    logger.debug( 'Exception in /gotoassignment: {0}'.format( message ) )
     return bottle.HTTPError( 500, message, e )
 
 
