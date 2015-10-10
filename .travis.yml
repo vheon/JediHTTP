@@ -1,4 +1,7 @@
 language: python
+sudo: false
+os:
+  - linux
 env:
   - TOX_ENV=py26
   - TOX_ENV=py27
