@@ -103,12 +103,7 @@ def error( err ):
 
 
 def _GetJediScript( request_data ):
-  try:
-    source = request_data[ 'source' ]
-    line   = request_data[ 'line' ]
-    col    = request_data[ 'col' ]
-    path   = request_data[ 'path' ]
-
-    return jedi.Script( source, line, col, path )
-  except:
-    raise
+  return jedi.Script( request_data[ 'source' ],
+                      request_data[ 'line' ],
+                      request_data[ 'col' ],
+                      request_data[ 'path' ] )
