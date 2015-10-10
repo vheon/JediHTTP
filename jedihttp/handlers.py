@@ -16,10 +16,12 @@ from bottle import response, request, error
 import json
 import jedi
 import logging
+from jedihttp.logger_plugin import LoggerPlugin
 
 
-app = bottle.Bottle( __name__ )
 logger = logging.getLogger( __name__ )
+app = bottle.Bottle( __name__ )
+app.install( LoggerPlugin( logger ) )
 
 
 @app.post( '/healthy' )
@@ -35,7 +37,6 @@ def ready():
 @app.post( '/completions' )
 def completions():
   try:
-    logger.debug( 'received /completions request' )
     script = _GetJediScript( request.json )
     return {
              'completions': [ {
@@ -49,14 +50,12 @@ def completions():
            }
   except Exception as e:
     message = str( e )
-    logger.debug( 'Exception in /completions: {0}'.format( message ) )
     return bottle.HTTPError( 500, message, e )
 
 
 @app.post( '/gotodefinition' )
 def gotodefinition():
   try:
-    logger.debug( 'received /gotodefinition request' )
     script = _GetJediScript( request.json )
     return {
              'definitions': [ {
@@ -78,7 +77,6 @@ def gotodefinition():
 @app.post( '/gotoassignment' )
 def gotoassignments():
   try:
-    logger.debug( 'received /gotoassignment request' )
     script = _GetJediScript( request.json )
     return {
              'definitions': [ {
