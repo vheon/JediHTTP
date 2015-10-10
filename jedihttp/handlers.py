@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from bottle import response, request, error, Bottle
 import jedi
 import logging
+from bottle import request, Bottle
 from jedihttp.logger_plugin import LoggerPlugin
 from jedihttp.exception_plugin import ExceptionPlugin
 
