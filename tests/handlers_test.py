@@ -117,17 +117,23 @@ def test_good_gotodefinition():
 
 
 def test_bad_gotodefinitions():
-  app = TestApp( handlers.app )
-  filepath = fixture_filepath( 'goto.py' )
-  request_data = {
-      'source': open( filepath ).read(),
-      'line': 9,
-      'col': 1,
-      'path': filepath
-  }
+  def gotodefinition_token_under_line( line ):
+    app = TestApp( handlers.app )
+    filepath = fixture_filepath( 'goto.py' )
+    request_data = {
+        'source': open( filepath ).read(),
+        'line': line,
+        'col': 1,
+        'path': filepath
+    }
+    response = app.post_json( '/gotodefinition', request_data, status = 500 )
+    assert_that( response.status_int, equal_to( 500 ) )
 
-  response = app.post_json( '/gotodefinition', request_data, status = 500 )
-  assert_that( response.status_int, equal_to( 500 ) )
+
+  # line 9 is a blank line
+  # line 100 do not exists
+  for line in [ 9, 100 ]:
+    yield gotodefinition_token_under_line, line
 
 
 def test_good_gotoassignment():
