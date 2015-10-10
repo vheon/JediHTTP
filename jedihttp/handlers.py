@@ -33,7 +33,7 @@ def ready():
 
 
 @app.post( '/completions' )
-def completion():
+def completions():
   try:
     logger.info( 'received /completions request' )
     script = _GetJediScript( request.json )
