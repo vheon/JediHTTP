@@ -103,7 +103,8 @@ def test_good_gotodefinition():
                                 'column': 4,
                                 'is_keyword': False,
                                 'module_path': filepath,
-                                'docstring': 'f()\n\nModule method docs\nAre dedented, like you might expect'
+                                'docstring': 'f()\n\nModule method docs\nAre '
+                                             'dedented, like you might expect'
                               },
                               {
                                 'description': 'class C',
@@ -176,4 +177,5 @@ def test_py3():
                                 request_data ).json[ 'completions' ]
 
   assert_that( completions, has_item( CompletionEntry( 'values' ) ) )
-  assert_that( completions, is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
+  assert_that( completions,
+               is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
