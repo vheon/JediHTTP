@@ -3,11 +3,13 @@ sudo: false
 os:
   - linux
 env:
-  - TOX_ENV=py26
-  - TOX_ENV=py27
-  - TOX_ENV=py33
+  # TOXENV specify under which environment tox should launch the tests
+  # https://testrun.org/tox/latest/
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py33
 before_install: git submodule update --init --recursive
 install: pip install tox
-script: tox -e $TOX_ENV
+script: tox
 notifications:
   email: false

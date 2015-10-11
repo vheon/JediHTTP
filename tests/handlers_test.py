@@ -16,25 +16,21 @@ utils.AddVendorFolderToSysPath()
 
 import os
 import sys
-import functools
 from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
-from nose.plugins.skip import SkipTest
 from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
                        has_item, has_items, has_entry, has_length, equal_to )
 
 import bottle
 bottle.debug( True )
 
+try:
+  import unittest2 as unittest
+except ImportError:
+  import unittest
 
-def py3only( test ):
-  @functools.wraps( test )
-  def wrapper():
-    if sys.version_info < ( 3, 0 ):
-      raise SkipTest( "Python 3.x only test" )
-    return test()
-  return wrapper
+py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
 
 
 def fixture_filepath( filename ):
