@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 def AddVendorFolderToSysPath():
   vendor_folder = os.path.join( os.path.dirname( __file__ ),
                                 '..',

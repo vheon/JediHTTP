@@ -92,7 +92,7 @@ def test_good_gotodefinition():
   }
 
   definitions = app.post_json( '/gotodefinition',
-                              request_data ).json[ 'definitions' ]
+                               request_data ).json[ 'definitions' ]
 
   assert_that( definitions, has_length( 2 ) )
   assert_that( definitions, has_items(
@@ -148,7 +148,7 @@ def test_good_gotoassignment():
   }
 
   definitions = app.post_json( '/gotoassignment',
-                              request_data ).json[ 'definitions' ]
+                               request_data ).json[ 'definitions' ]
 
   assert_that( definitions, has_length( 1 ) )
   assert_that( definitions, has_item( {
