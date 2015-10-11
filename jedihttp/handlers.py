@@ -11,11 +11,12 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from __future__ import absolute_import
 import jedi
 import logging
 from bottle import request, Bottle
-from logger_plugin import LoggerPlugin
-from exception_plugin import ExceptionPlugin
+from .logger_plugin import LoggerPlugin
+from .exception_plugin import ExceptionPlugin
 
 
 logger = logging.getLogger( __name__ )
