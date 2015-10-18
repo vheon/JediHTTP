@@ -31,8 +31,6 @@ def HmacGenerator( secret ):
                                    digestmod = hashlib.sha256 ).digest()
 
 
-
-
 class HmacPlugin( object ):
   """
   Bottle plugin for hmac request authentication
