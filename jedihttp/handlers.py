@@ -14,29 +14,30 @@
 from __future__ import absolute_import
 import jedi
 import logging
-from bottle import request, Bottle
-from .logger_plugin import LoggerPlugin
-from .exception_plugin import ExceptionPlugin
+import httplib
+import json
+from bottle import response, request, Bottle
 
 
 logger = logging.getLogger( __name__ )
 app = Bottle( __name__ )
-app.install( LoggerPlugin( logger ) )
-app.install( ExceptionPlugin( logger ) )
 
 
 @app.post( '/healthy' )
 def healthy():
+  logger.debug( 'received /healthy request' )
   return { 'healthy': True }
 
 
 @app.post( '/ready' )
 def ready():
+  logger.debug( 'received /ready request' )
   return { 'ready': True }
 
 
 @app.post( '/completions' )
 def completions():
+  logger.debug( 'received /completions request' )
   script = _GetJediScript( request.json )
   return {
       'completions': [ {
@@ -52,12 +53,14 @@ def completions():
 
 @app.post( '/gotodefinition' )
 def gotodefinition():
+  logger.debug( 'received /gotodefinition request' )
   script = _GetJediScript( request.json )
   return _FormatGoToDefinitions( script.goto_definitions() )
 
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
+  logger.debug( 'received /gotoassignment request' )
   script = _GetJediScript( request.json )
   return _FormatGoToDefinitions( script.goto_assignments() )
 
@@ -76,13 +79,27 @@ def _FormatGoToDefinitions( definitions ):
   }
 
 
-@app.error()
-def error( err ):
-  return err.body
-
-
 def _GetJediScript( request_data ):
   return jedi.Script( request_data[ 'source' ],
                       request_data[ 'line' ],
                       request_data[ 'col' ],
                       request_data[ 'path' ] )
+
+
+@app.error( httplib.INTERNAL_SERVER_ERROR )
+def ErrorHandler( httperror ):
+  response.content_type = 'application/json'
+  return json.dumps( {
+    'exception': httperror.exception,
+    'message': str( httperror.exception ),
+    'traceback': httperror.traceback
+  }, default = _Serializer )
+
+
+def _Serializer( obj ):
+  try:
+    serialized = obj.__dict__.copy()
+    serialized[ 'TYPE' ] = type( obj ).__name__
+    return serialized
+  except AttributeError:
+    return str( obj )
