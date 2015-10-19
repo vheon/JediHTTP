@@ -13,12 +13,17 @@
 
 
 import logging
-import httplib
 import hmac
 import hashlib
-from urlparse import urlparse
 from bottle import request, response, abort
 from base64 import b64decode, b64encode
+
+try:
+  from urllib.parse import urlparse
+  from http import client as httplib
+except ImportError:
+  from urlparse import urlparse
+  import httplib
 
 
 _HMAC_HEADER = 'x-jedihttp-hmac'
