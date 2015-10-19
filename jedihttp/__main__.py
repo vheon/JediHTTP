@@ -26,13 +26,15 @@ def ParseArgs():
                        help = 'server host' )
   parser.add_argument( '--port', type = int, default = 0,
                        help = 'server port' )
+  parser.add_argument( '--hmac-secret', type = str, required = True,
+                       help = 'hmac secret' )
   return parser.parse_args()
 
 
 def Main():
   args = ParseArgs()
 
-  handlers.app.install( HmacPlugin( '' ) )
+  handlers.app.install( HmacPlugin( args.hmac_secret ) )
   serve( handlers.app,
          host = args.host,
          port = args.port )
