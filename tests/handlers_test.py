@@ -123,7 +123,7 @@ def test_bad_gotodefinitions():
         'col': 1,
         'path': filepath
     }
-    response = app.post_json( '/gotodefinition', request_data, status = 500 )
+    response = app.post_json( '/gotodefinition',request_data, expect_errors = True )
     assert_that( response.status_int, equal_to( 500 ) )
 
 
