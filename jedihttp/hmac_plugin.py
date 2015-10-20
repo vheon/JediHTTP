@@ -67,7 +67,7 @@ class HmacPlugin( object ):
     hmac_value = self._hmachelper.GetHmacHeader( request.headers )
     hmac_computed = self._hmachelper.ComputeRequestHmac( request.method,
                                                          request.path,
-                                                         request.body.read() ) )
+                                                         request.body.read() )
     return hmaclib.SecureStringsEqual( hmac_value, hmac_computed )
 
 
