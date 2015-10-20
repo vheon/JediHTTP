@@ -11,9 +11,10 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from __future__ import absolute_import
 import sys
 import time
-import utils
+from . import utils
 import requests
 import subprocess
 from jedihttp.hmaclib import JediHTTPHmacHelper
