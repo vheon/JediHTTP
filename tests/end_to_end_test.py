@@ -13,20 +13,17 @@
 
 from __future__ import absolute_import
 import sys
-import tempfile
 from . import utils
 import requests
 import subprocess
-from jedihttp.hmaclib import JediHTTPHmacHelper
+from jedihttp import hmaclib
 from os import path
 from hamcrest import assert_that, equal_to
 
 try:
   from http import client as httplib
-  from configparser import RawConfigParser
 except ImportError:
   import httplib
-  from ConfigParser import RawConfigParser
 
 
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
@@ -36,13 +33,7 @@ def test_it_works():
   port = 50000
   secret = "secret"
 
-  with tempfile.NamedTemporaryFile( 'w', delete = False ) as hmac_file:
-    config = RawConfigParser()
-    config.add_section( 'HMAC' )
-    config.set( 'HMAC', 'secret', secret )
-    config.write( hmac_file )
-    hmac_file.flush()
-
+  with hmaclib.TemporaryHmacSecretFile( secret ) as hmac_file:
     command = [ sys.executable,
                 '-u', # this flag makes stdout non buffered
                 PATH_TO_JEDIHTTP,
@@ -56,7 +47,7 @@ def test_it_works():
   jedihttp.stdout.readline()
 
   headers = {}
-  hmachelper = JediHTTPHmacHelper( secret )
+  hmachelper = hmaclib.JediHTTPHmacHelper( secret )
   hmachelper.SetHmacHeader( headers,
                             hmachelper.ComputeRequestHmac( 'POST', '/ready', '' ) )
 

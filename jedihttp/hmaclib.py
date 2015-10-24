@@ -14,7 +14,13 @@
 import sys
 import hmac
 import hashlib
+import tempfile
 from base64 import b64encode, b64decode
+
+try:
+  from configparser import RawConfigParser
+except ImportError:
+  from ConfigParser import RawConfigParser
 
 
 if sys.version_info[0] == 3:
@@ -23,6 +29,16 @@ if sys.version_info[0] == 3:
 else:
   def b( value ):
     return value
+
+
+def TemporaryHmacSecretFile( secret ):
+  hmac_file = tempfile.NamedTemporaryFile( 'w', delete = False )
+  config = RawConfigParser()
+  config.add_section( 'HMAC' )
+  config.set( 'HMAC', 'secret', secret )
+  config.write( hmac_file )
+  hmac_file.flush()
+  return hmac_file
 
 
 _HMAC_HEADER = 'x-jedihttp-hmac'
