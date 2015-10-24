@@ -11,8 +11,6 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from jedihttp import utils
-utils.AddVendorFolderToSysPath()
 
 import os
 import sys

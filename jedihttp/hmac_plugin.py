@@ -13,8 +13,12 @@
 
 
 import logging
-import hmaclib
 from bottle import request, response, abort
+
+try:
+  import hmaclib
+except:
+  from . import hmaclib
 
 try:
   from urllib.parse import urlparse
@@ -52,7 +56,7 @@ class HmacPlugin( object ):
         return
       body = callback( *args, **kwargs )
       self._hmachelper.SetHmacHeader( response.headers,
-                                     self._hmachelper.Hmac( body ) )
+                                      self._hmachelper.Hmac( body ) )
       return body
     return wrapper
 

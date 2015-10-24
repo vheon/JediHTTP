@@ -25,10 +25,22 @@ except ImportError:
 
 if sys.version_info[0] == 3:
   def b( value ):
-    return value.encode( 'utf8' ) if isinstance( value, str ) else value
+    return value.encode( 'latin-1' )
+
+  def encode_string( value ):
+    return value.encode('utf-8') if isinstance(value, str) else value
+
+  def decode_string(value):
+      return value if isinstance(value, str) else value.decode('utf-8')
 else:
   def b( value ):
     return value
+
+  def encode_string( value ):
+    return value.encode('utf-8') if isinstance(value, unicode) else value # noqa
+
+  def decode_string(value):
+    return value if isinstance(value, basestring) else value.decode('utf-8') # noqa
 
 
 def TemporaryHmacSecretFile( secret ):
@@ -44,11 +56,11 @@ def TemporaryHmacSecretFile( secret ):
 _HMAC_HEADER = 'x-jedihttp-hmac'
 
 
-class JediHTTPHmacHelper( object):
+class JediHTTPHmacHelper( object ):
   """Helper class to correctly signing requests and validating responses when
   communicating with a JediHTTP server."""
   def __init__( self, secret ):
-    self._secret = secret
+    self._secret = b( secret )
 
 
   def HasHeader( self, headers ):
@@ -56,7 +68,7 @@ class JediHTTPHmacHelper( object):
 
 
   def SetHmacHeader( self, headers, hmac ):
-    headers[ _HMAC_HEADER ] = b64encode( hmac )
+    headers[ _HMAC_HEADER ] = decode_string( b64encode( hmac ) )
 
 
   def GetHmacHeader( self, headers ):
@@ -64,15 +76,24 @@ class JediHTTPHmacHelper( object):
 
 
   def Hmac( self, content ):
-    return hmac.new(  b( self._secret ),
-                      msg = b( content ),
-                      digestmod = hashlib.sha256 ).digest()
+    return hmac.new( self._secret,
+                     msg = encode_string( content ),
+                     digestmod = hashlib.sha256 ).digest()
 
 
   def ComputeRequestHmac( self, method, path, body ):
     return self.Hmac( b''.join( ( self.Hmac( method ),
                                   self.Hmac( path ),
                                   self.Hmac( body ) ) ) )
+
+
+  def IsResponseAuthenticated( self, headers, content ):
+    if not self.HasHeader( headers ):
+      return False
+
+    return compare_digest( self.GetHmacHeader( headers ),
+                           self.Hmac( content ) )
+
 
 
 # hmac.compare_digest were introduced in python 2.7.7

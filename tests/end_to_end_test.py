@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from __future__ import absolute_import
+
 import sys
 from . import utils
 import requests
@@ -56,3 +56,5 @@ def test_it_works():
   utils.TerminateProcess( jedihttp.pid )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
+  assert_that( hmachelper.IsResponseAuthenticated( response.headers,
+                                                   response.content ) )

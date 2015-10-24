@@ -12,6 +12,12 @@
 #    limitations under the License.
 
 
+try:
+  import utils
+except:
+  from . import utils
+utils.AddVendorFolderToSysPath()
+
 import jedi
 import logging
 import json

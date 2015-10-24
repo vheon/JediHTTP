@@ -13,6 +13,8 @@
 
 # Almost all the functions are taken from
 # https://github.com/Valloric/ycmd/blob/master/ycmd/utils.py
+
+
 import sys
 import os
 import signal
