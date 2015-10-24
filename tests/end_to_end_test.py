@@ -13,6 +13,7 @@
 
 from __future__ import absolute_import
 import sys
+import tempfile
 from . import utils
 import requests
 import subprocess
@@ -22,8 +23,10 @@ from hamcrest import assert_that, equal_to
 
 try:
   from http import client as httplib
+  from configparser import RawConfigParser
 except ImportError:
   import httplib
+  from ConfigParser import RawConfigParser
 
 
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
@@ -32,14 +35,23 @@ PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
 def test_it_works():
   port = 50000
   secret = "secret"
-  command = [ sys.executable,
-              '-u', # this flag makes stdout non buffered
-              PATH_TO_JEDIHTTP,
-              '--port', str( port ),
-              '--hmac-secret', secret ]
-  jedihttp = utils.SafePopen( command,
-                              stderr = subprocess.STDOUT,
-                              stdout = subprocess.PIPE )
+
+  with tempfile.NamedTemporaryFile( 'w', delete = False ) as hmac_file:
+    config = RawConfigParser()
+    config.add_section( 'HMAC' )
+    config.set( 'HMAC', 'secret', secret )
+    config.write( hmac_file )
+    hmac_file.flush()
+
+    command = [ sys.executable,
+                '-u', # this flag makes stdout non buffered
+                PATH_TO_JEDIHTTP,
+                '--port', str( port ),
+                '--hmac-file-secret', hmac_file.name ]
+    jedihttp = utils.SafePopen( command,
+                                stderr = subprocess.STDOUT,
+                                stdout = subprocess.PIPE )
+
   # wait for the process to print something, so we know it is ready
   jedihttp.stdout.readline()
 

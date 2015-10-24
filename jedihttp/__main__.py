@@ -14,10 +14,17 @@
 import utils
 utils.AddVendorFolderToSysPath()
 
+import sys
+import os
 from argparse import ArgumentParser
 from waitress import serve
 import handlers
 from hmac_plugin import HmacPlugin
+
+try:
+  from ConfigParser import RawConfigParser, NoOptionError
+except ImportError:
+  from configparser import RawConfigParser, NoOptionError
 
 
 def ParseArgs():
@@ -26,15 +33,25 @@ def ParseArgs():
                        help = 'server host' )
   parser.add_argument( '--port', type = int, default = 0,
                        help = 'server port' )
-  parser.add_argument( '--hmac-secret', type = str, required = True,
-                       help = 'hmac secret' )
+  parser.add_argument( '--hmac-file-secret', type = str, required = True,
+                       help = 'file containing hmac secret' )
   return parser.parse_args()
 
 
 def Main():
   args = ParseArgs()
+  config = RawConfigParser()
+  config.read( args.hmac_file_secret )
+  try:
+    hmac_secret = config.get( 'HMAC', 'secret' )
+    if not hmac_secret:
+      sys.exit( 'Found HMAC secret key with no value in the passed config file' )
+  except NoOptionError:
+    sys.exit( 'No HMAC secret was found in the passed config file' )
 
-  handlers.app.install( HmacPlugin( args.hmac_secret ) )
+  os.remove( args.hmac_file_secret )
+
+  handlers.app.install( HmacPlugin( hmac_secret ) )
   serve( handlers.app,
          host = args.host,
          port = args.port )
