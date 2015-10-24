@@ -30,20 +30,20 @@ app = Bottle( __name__ )
 @app.post( '/healthy' )
 def healthy():
   logger.debug( 'received /healthy request' )
-  return { 'healthy': True }
+  return _JsonResponse( True )
 
 
 @app.post( '/ready' )
 def ready():
   logger.debug( 'received /ready request' )
-  return { 'ready': True }
+  return _JsonResponse( True )
 
 
 @app.post( '/completions' )
 def completions():
   logger.debug( 'received /completions request' )
   script = _GetJediScript( request.json )
-  return {
+  return _JsonResponse( {
       'completions': [ {
         'name':        completion.name,
         'description': completion.description,
@@ -52,21 +52,21 @@ def completions():
         'line':        completion.line,
         'column':      completion.column
       } for completion in script.completions() ]
-  }
+  } )
 
 
 @app.post( '/gotodefinition' )
 def gotodefinition():
   logger.debug( 'received /gotodefinition request' )
   script = _GetJediScript( request.json )
-  return _FormatGoToDefinitions( script.goto_definitions() )
+  return _JsonResponse( _FormatGoToDefinitions( script.goto_definitions() ) )
 
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
   logger.debug( 'received /gotoassignment request' )
   script = _GetJediScript( request.json )
-  return _FormatGoToDefinitions( script.goto_assignments() )
+  return _JsonResponse( _FormatGoToDefinitions( script.goto_assignments() ) )
 
 
 def _FormatGoToDefinitions( definitions ):
@@ -90,14 +90,19 @@ def _GetJediScript( request_data ):
                       request_data[ 'path' ] )
 
 
+# XXX(vheon): apparently this is not covered by the hmac_plugin!!!
 @app.error( httplib.INTERNAL_SERVER_ERROR )
 def ErrorHandler( httperror ):
-  response.content_type = 'application/json'
-  return json.dumps( {
+  return _JsonResponse( {
     'exception': httperror.exception,
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
-  }, default = _Serializer )
+  } )
+
+
+def _JsonResponse( data ):
+  response.content_type = 'application/json'
+  return json.dumps( data, default = _Serializer )
 
 
 def _Serializer( obj ):
