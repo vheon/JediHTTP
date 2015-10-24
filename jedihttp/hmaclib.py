@@ -11,9 +11,18 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import sys
 import hmac
 import hashlib
 from base64 import b64encode, b64decode
+
+
+if sys.version_info[0] == 3:
+  def b( value ):
+    return value.encode( 'utf8' ) if isinstance( value, str ) else value
+else:
+  def b( value ):
+    return value
 
 
 _HMAC_HEADER = 'x-jedihttp-hmac'
@@ -39,39 +48,46 @@ class JediHTTPHmacHelper( object):
 
 
   def Hmac( self, content ):
-    return hmac.new( str( self._secret ),
-                     msg = str( content ),
-                     digestmod = hashlib.sha256 ).digest()
+    return hmac.new(  b( self._secret ),
+                      msg = b( content ),
+                      digestmod = hashlib.sha256 ).digest()
 
 
   def ComputeRequestHmac( self, method, path, body ):
-    return self.Hmac( ''.join( ( self.Hmac( method ),
-                                 self.Hmac( path ),
-                                 self.Hmac( body ) ) ) )
+    return self.Hmac( b''.join( ( self.Hmac( method ),
+                                  self.Hmac( path ),
+                                  self.Hmac( body ) ) ) )
 
 
+# hmac.compare_digest were introduced in python 2.7.7
+if sys.version_info >= ( 2, 7, 7 ):
+  from hmac import compare_digest as SecureStringsEqual
+else:
+  # This is the compare_digest function from python 3.4, adapted for 2.6:
+  # http://hg.python.org/cpython/file/460407f35aa9/Lib/hmac.py#l16
+  #
+  # Stolen from https://github.com/Valloric/ycmd
+  def SecureStringsEqual( a, b ):
+    """Returns the equivalent of 'a == b', but avoids content based short
+    circuiting to reduce the vulnerability to timing attacks."""
+    # Consistent timing matters more here than data type flexibility
+    if not ( isinstance( a, str ) and isinstance( b, str ) ):
+      raise TypeError( "inputs must be str instances" )
+
+    # We assume the length of the expected digest is public knowledge,
+    # thus this early return isn't leaking anything an attacker wouldn't
+    # already know
+    if len( a ) != len( b ):
+      return False
+
+    # We assume that integers in the bytes range are all cached,
+    # thus timing shouldn't vary much due to integer object creation
+    result = 0
+    for x, y in zip( a, b ):
+      result |= ord( x ) ^ ord( y )
+    return result == 0
 
 
-# This is the compare_digest function from python 3.4, adapted for 2.7:
-# http://hg.python.org/cpython/file/460407f35aa9/Lib/hmac.py#l16
-#
-# Stolen from https://github.com/Valloric/ycmd
-def SecureStringsEqual( a, b ):
-  """Returns the equivalent of 'a == b', but avoids content based short
-  circuiting to reduce the vulnerability to timing attacks."""
-  # Consistent timing matters more here than data type flexibility
-  if not ( isinstance( a, str ) and isinstance( b, str ) ):
-    raise TypeError( "inputs must be str instances" )
+def compare_digest( a, b ):
+  return SecureStringsEqual( a, b )
 
-  # We assume the length of the expected digest is public knowledge,
-  # thus this early return isn't leaking anything an attacker wouldn't
-  # already know
-  if len( a ) != len( b ):
-    return False
-
-  # We assume that integers in the bytes range are all cached,
-  # thus timing shouldn't vary much due to integer object creation
-  result = 0
-  for x, y in zip( a, b ):
-    result |= ord( x ) ^ ord( y )
-  return result == 0

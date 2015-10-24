@@ -13,12 +13,10 @@
 
 from __future__ import absolute_import
 import sys
-import time
 from . import utils
 import requests
 import subprocess
 from jedihttp.hmaclib import JediHTTPHmacHelper
-from base64 import b64encode
 from os import path
 from hamcrest import assert_that, equal_to
 

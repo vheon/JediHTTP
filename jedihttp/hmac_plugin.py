@@ -13,11 +13,8 @@
 
 
 import logging
-import hmac
-import hashlib
+import hmaclib
 from bottle import request, response, abort
-from base64 import b64decode, b64encode
-from hmaclib import JediHTTPHmacHelper
 
 try:
   from urllib.parse import urlparse
@@ -37,7 +34,7 @@ class HmacPlugin( object ):
 
 
   def __init__( self, hmac_secret ):
-    self._hmachelper = JediHTTPHmacHelper( hmac_secret )
+    self._hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
     self._logger = logging.getLogger( __name__ )
 
 
@@ -68,7 +65,7 @@ class HmacPlugin( object ):
     hmac_computed = self._hmachelper.ComputeRequestHmac( request.method,
                                                          request.path,
                                                          request.body.read() )
-    return hmaclib.SecureStringsEqual( hmac_value, hmac_computed )
+    return hmaclib.compare_digest( hmac_value, hmac_computed )
 
 
 def IsLocalRequest():
