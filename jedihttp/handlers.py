@@ -14,9 +14,13 @@
 from __future__ import absolute_import
 import jedi
 import logging
-import httplib
 import json
 from bottle import response, request, Bottle
+
+try:
+  from http import client as httplib
+except ImportError:
+  import httplib
 
 
 logger = logging.getLogger( __name__ )
