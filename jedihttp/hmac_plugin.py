@@ -54,22 +54,22 @@ class HmacPlugin( object ):
         self._logger.info( 'Dropping request with bad HMAC.' )
         abort( httplib.UNAUTHORIZED, 'Unauthorized, received bad HMAC.' )
         return
+
       body = callback( *args, **kwargs )
-      self._hmachelper.SetHmacHeader( response.headers,
-                                      self._hmachelper.Hmac( body ) )
+      self.SignResponseHeaders( response.headers, body )
       return body
     return wrapper
 
 
   def IsRequestAuthenticated( self ):
-    if not self._hmachelper.HasHeader( request.headers ):
-      return False
+    return self._hmachelper.IsRequestAuthenticated( request.headers,
+                                                    request.method,
+                                                    request.path,
+                                                    request.body.read() )
 
-    hmac_value = self._hmachelper.GetHmacHeader( request.headers )
-    hmac_computed = self._hmachelper.ComputeRequestHmac( request.method,
-                                                         request.path,
-                                                         request.body.read() )
-    return hmaclib.compare_digest( hmac_value, hmac_computed )
+
+  def SignResponseHeaders( self, headers, body ):
+    self._hmachelper.SignResponseHeaders( headers, body )
 
 
 def IsLocalRequest():

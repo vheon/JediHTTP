@@ -87,6 +87,18 @@ class JediHTTPHmacHelper( object ):
                                   self.Hmac( body ) ) ) )
 
 
+  def IsRequestAuthenticated( self, headers, method, path, body ):
+    if not self.HasHeader( headers ):
+      return False
+
+    return compare_digest( self.GetHmacHeader( headers ),
+                           self.ComputeRequestHmac( method, path, body ) )
+
+
+  def SignResponseHeaders( self, headers, body ):
+    self.SetHmacHeader( headers, self.Hmac( body ) )
+
+
   def IsResponseAuthenticated( self, headers, content ):
     if not self.HasHeader( headers ):
       return False
