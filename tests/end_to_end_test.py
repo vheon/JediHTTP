@@ -48,8 +48,10 @@ def test_it_works():
 
   headers = {}
   hmachelper = hmaclib.JediHTTPHmacHelper( secret )
-  hmachelper.SetHmacHeader( headers,
-                            hmachelper.ComputeRequestHmac( 'POST', '/ready', '' ) )
+  hmachelper.SignRequestHeaders( headers,
+                                 method = 'POST',
+                                 path = '/ready',
+                                 body = '' )
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( port ),
                             headers = headers )

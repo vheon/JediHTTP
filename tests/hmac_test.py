@@ -25,8 +25,10 @@ def test_handle_without_params():
 
   headers = {}
   hmachelper = hmaclib.JediHTTPHmacHelper( secret )
-  hmachelper.SetHmacHeader( headers,
-                            hmachelper.ComputeRequestHmac( 'POST', handle, '' ) )
+  hmachelper.SignRequestHeaders( headers,
+                                 method = 'POST',
+                                 path = handle,
+                                 body = '' )
 
   response = app.post( handle, headers = headers )
 
