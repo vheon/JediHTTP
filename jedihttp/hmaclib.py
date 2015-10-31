@@ -24,23 +24,16 @@ except ImportError:
 
 
 if sys.version_info[0] == 3:
-  def b( value ):
-    return value.encode( 'latin-1' )
+  basestring = str
+  unicode = str
 
-  def encode_string( value ):
-    return value.encode('utf-8') if isinstance(value, str) else value
 
-  def decode_string(value):
-      return value if isinstance(value, str) else value.decode('utf-8')
-else:
-  def b( value ):
-    return value
+def encode_string( value ):
+  return value.encode('utf-8') if isinstance(value, unicode) else value
 
-  def encode_string( value ):
-    return value.encode('utf-8') if isinstance(value, unicode) else value # noqa
 
-  def decode_string(value):
-    return value if isinstance(value, basestring) else value.decode('utf-8') # noqa
+def decode_string(value):
+  return value if isinstance(value, basestring) else value.decode('utf-8')
 
 
 def TemporaryHmacSecretFile( secret ):
