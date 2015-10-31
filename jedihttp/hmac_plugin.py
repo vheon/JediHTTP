@@ -15,6 +15,8 @@
 import logging
 from bottle import request, response, abort
 
+# XXX(vheon): If I don't do this then some tests are going to fail because
+# handlers.py could not find utils.py; I don't know why though.
 try:
   import hmaclib
 except:
