@@ -67,7 +67,7 @@ class JediHTTPHmacHelper( object ):
   """Helper class to correctly signing requests and validating responses when
   communicating with a JediHTTP server."""
   def __init__( self, secret ):
-    self._secret = b( secret )
+    self._secret = encode_string( secret )
 
 
   def _HasHeader( self, headers ):
