@@ -17,11 +17,6 @@ import hashlib
 import tempfile
 from base64 import b64encode, b64decode
 
-try:
-  from configparser import RawConfigParser
-except ImportError:
-  from ConfigParser import RawConfigParser
-
 
 if sys.version_info[0] == 3:
   basestring = str
@@ -39,16 +34,15 @@ def decode_string(value):
 def TemporaryHmacSecretFile( secret ):
   """Helper function for passing the hmac secret when starting a JediHTTP server
 
-    with TemporaryHmacSecretFile( 'mysecret' ) as hamc_file:
-      jedihttp = subprocess.Popen( .... )
+    with TemporaryHmacSecretFile( 'mysecret' ) as hmac_file:
+      jedihttp = subprocess.Popen( ['python',
+                                    'jedihttp',
+                                    '--hmac-file-secret', hmac_file.name ] )
 
     The JediHTTP Server as soon as it reads the hmac secret will remove the file
   """
   hmac_file = tempfile.NamedTemporaryFile( 'w', delete = False )
-  config = RawConfigParser()
-  config.add_section( 'HMAC' )
-  config.set( 'HMAC', 'secret', secret )
-  config.write( hmac_file )
+  hmac_file.write( secret )
   hmac_file.flush()
   return hmac_file
 
