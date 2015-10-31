@@ -12,6 +12,7 @@
 #    limitations under the License.
 
 import sys
+import json
 import hmac
 import hashlib
 import tempfile
@@ -42,8 +43,7 @@ def TemporaryHmacSecretFile( secret ):
     The JediHTTP Server as soon as it reads the hmac secret will remove the file
   """
   hmac_file = tempfile.NamedTemporaryFile( 'w', delete = False )
-  hmac_file.write( secret )
-  hmac_file.flush()
+  json.dump( { 'hmac_secret': secret }, hmac_file )
   return hmac_file
 
 

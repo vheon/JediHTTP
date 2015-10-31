@@ -44,7 +44,7 @@ def test_it_works():
                                 stdout = subprocess.PIPE )
 
   # wait for the process to print something, so we know it is ready
-  jedihttp.stdout.readline()
+  line = jedihttp.stdout.readline()
 
   headers = {}
   hmachelper = hmaclib.JediHTTPHmacHelper( secret )

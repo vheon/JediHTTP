@@ -14,7 +14,9 @@
 import utils
 utils.AddVendorFolderToSysPath()
 
+import sys
 import os
+import json
 from argparse import ArgumentParser
 from waitress import serve
 import handlers
@@ -32,12 +34,24 @@ def ParseArgs():
   return parser.parse_args()
 
 
+def GetSecretFromTempFile( tfile ):
+  key = 'hmac_secret'
+  with open( tfile ) as hmac_file:
+    try:
+      data = json.load( hmac_file )
+      if key not in data:
+        sys.exit( "A json file with a key named 'secret' was expected for "
+                  "the secret exchange, but wasn't found" )
+      hmac_secret = data[ key ]
+    except ValueError:
+      sys.exit( "A JSON was expected for the secret exchange" )
+  os.remove( tfile )
+  return hmac_secret
+
+
 def Main():
   args = ParseArgs()
-  with open( args.hmac_file_secret ) as hmac_file:
-    hmac_secret = hmac_file.readline()
-  os.remove( args.hmac_file_secret )
-
+  hmac_secret = GetSecretFromTempFile( args.hmac_file_secret )
   handlers.app.install( HmacPlugin( hmac_secret ) )
   serve( handlers.app,
          host = args.host,
