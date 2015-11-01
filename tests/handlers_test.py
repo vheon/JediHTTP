@@ -12,8 +12,10 @@
 #    limitations under the License.
 
 
-import os
+from __future__ import absolute_import
+
 import sys
+from .utils import fixture_filepath
 from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
@@ -31,11 +33,6 @@ except ImportError:
 py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
 
 
-def fixture_filepath( filename ):
-  dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-  return os.path.join( dir_of_current_script, 'fixtures', filename )
-
-
 def CompletionEntry( name ):
   return has_entry( 'name', name )
 
@@ -44,7 +41,6 @@ def valid_completions():
   return all_of( has_key( 'docstring' ),
                  has_key( 'name' ),
                  has_key( 'description' ) )
-
 
 
 def test_healthy():

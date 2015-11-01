@@ -27,6 +27,11 @@ except NameError:
   basestring = str
 
 
+def fixture_filepath( filename ):
+  dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
+  return os.path.join( dir_of_current_script, 'fixtures', filename )
+
+
 # Creation flag to disable creating a console window on Windows. See
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863.aspx
 CREATE_NO_WINDOW = 0x08000000

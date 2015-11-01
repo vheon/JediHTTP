@@ -81,3 +81,45 @@ def test_client_request_without_parameters():
   hmachelper = hmaclib.JediHTTPHmacHelper( secret )
   assert_that( hmachelper.IsResponseAuthenticated( response.headers,
                                                    response.content ) )
+
+
+@with_setup( teardown = teardown )
+def test_client_request_with_parameters():
+  port = 50000
+  secret = "secret"
+
+  with hmaclib.TemporaryHmacSecretFile( secret ) as hmac_file:
+    command = [ sys.executable,
+                '-u', # this flag makes stdout non buffered
+                PATH_TO_JEDIHTTP,
+                '--port', str( port ),
+                '--hmac-file-secret', hmac_file.name ]
+    global JEDIHTTP
+    JEDIHTTP = utils.SafePopen( command,
+                                stderr = subprocess.STDOUT,
+                                stdout = subprocess.PIPE )
+
+  # wait for the process to print something, so we know it is ready
+  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
+  # check if the jedihttp started as expected
+  good_start = line.startswith( 'serving on' )
+  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
+  assert_that( good_start, reason )
+
+  filepath = utils.fixture_filepath( 'goto.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 10,
+      'col': 3,
+      'path': filepath
+  }
+
+  response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( port ),
+                            json = request_data,
+                            auth = HMACAuth( secret ) )
+
+  assert_that( response.status_code, equal_to( httplib.OK ) )
+
+  hmachelper = hmaclib.JediHTTPHmacHelper( secret )
+  assert_that( hmachelper.IsResponseAuthenticated( response.headers,
+                                                   response.content ) )
