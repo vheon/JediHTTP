@@ -1,7 +1,8 @@
 # JediHTTP
 
-[![Build
-Status](http://img.shields.io/travis-ci/vheon/JediHTTP.svg?style=flat-square)](https://travis-ci.org/vheon/JediHTTP)
+[![Build Status](https://travis-ci.org/vheon/JediHTTP.svg?branch=master)](https://travis-ci.org/vheon/JediHTTP)
+[![Build status](https://ci.appveyor.com/api/projects/status/28ebc35ocjk9eaew/branch/master?svg=true)](https://ci.appveyor.com/project/vheon/jedihttp/branch/master)
+
 
 A simple http/json wrapper around [jedi][].
 
