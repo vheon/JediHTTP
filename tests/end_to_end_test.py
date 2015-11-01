@@ -44,7 +44,11 @@ def test_it_works():
                                 stdout = subprocess.PIPE )
 
   # wait for the process to print something, so we know it is ready
-  line = jedihttp.stdout.readline()
+  line = jedihttp.stdout.readline().decode( 'utf8' )
+  # check if the jedihttp started as expected
+  good_start = line.startswith( 'serving on' )
+  reason = jedihttp.stdout.read().decode( 'utf8' ) if not good_start else ''
+  assert_that( good_start, reason )
 
   headers = {}
   hmachelper = hmaclib.JediHTTPHmacHelper( secret )
