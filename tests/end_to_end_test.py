@@ -47,6 +47,13 @@ SECRET = 'secret'
 JEDIHTTP = None
 
 
+def wait_for_jedihttp_to_start():
+  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
+  good_start = line.startswith( 'serving on' )
+  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
+  return good_start, reason
+
+
 def setup_jedihttp():
   with hmaclib.TemporaryHmacSecretFile( SECRET ) as hmac_file:
     command = [ sys.executable,
@@ -66,13 +73,8 @@ def teardown_jedihttp():
 
 @with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
 def test_client_request_without_parameters():
-  # wait for the process to print something, so we know it is ready
-  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
-  # check if the jedihttp started as expected
-  good_start = line.startswith( 'serving on' )
-  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
+  good_start, reason = wait_for_jedihttp_to_start()
   assert_that( good_start, reason )
-
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( PORT ),
                             auth = HMACAuth( SECRET ) )
@@ -86,11 +88,7 @@ def test_client_request_without_parameters():
 
 @with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
 def test_client_request_with_parameters():
-  # wait for the process to print something, so we know it is ready
-  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
-  # check if the jedihttp started as expected
-  good_start = line.startswith( 'serving on' )
-  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
+  good_start, reason = wait_for_jedihttp_to_start()
   assert_that( good_start, reason )
 
   filepath = utils.fixture_filepath( 'goto.py' )
