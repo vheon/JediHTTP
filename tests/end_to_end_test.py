@@ -18,6 +18,7 @@ import requests
 import subprocess
 from jedihttp import hmaclib
 from os import path
+from nose.tools import with_setup
 from hamcrest import assert_that, equal_to
 
 try:
@@ -29,6 +30,14 @@ except ImportError:
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
                                             '..', 'jedihttp' ) )
 
+JEDIHTTP = None
+
+
+def teardown():
+  utils.TerminateProcess( JEDIHTTP.pid )
+
+
+@with_setup( teardown = teardown )
 def test_it_works():
   port = 50000
   secret = "secret"
@@ -39,15 +48,16 @@ def test_it_works():
                 PATH_TO_JEDIHTTP,
                 '--port', str( port ),
                 '--hmac-file-secret', hmac_file.name ]
-    jedihttp = utils.SafePopen( command,
+    global JEDIHTTP
+    JEDIHTTP = utils.SafePopen( command,
                                 stderr = subprocess.STDOUT,
                                 stdout = subprocess.PIPE )
 
   # wait for the process to print something, so we know it is ready
-  line = jedihttp.stdout.readline().decode( 'utf8' )
+  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
   # check if the jedihttp started as expected
   good_start = line.startswith( 'serving on' )
-  reason = jedihttp.stdout.read().decode( 'utf8' ) if not good_start else ''
+  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
   assert_that( good_start, reason )
 
   headers = {}
@@ -59,7 +69,6 @@ def test_it_works():
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( port ),
                             headers = headers )
-  utils.TerminateProcess( jedihttp.pid )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
   assert_that( hmachelper.IsResponseAuthenticated( response.headers,
