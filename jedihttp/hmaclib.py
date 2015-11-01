@@ -76,6 +76,8 @@ class JediHTTPHmacHelper( object ):
 
 
   def _ComputeRequestHmac( self, method, path, body ):
+    if not body:
+      body = ''
     return self._Hmac( b''.join( ( self._Hmac( method ),
                                   self._Hmac( path ),
                                   self._Hmac( body ) ) ) )
@@ -103,7 +105,6 @@ class JediHTTPHmacHelper( object ):
 
     return compare_digest( self._GetHmacHeader( headers ),
                            self._Hmac( content ) )
-
 
 
 # hmac.compare_digest were introduced in python 2.7.7

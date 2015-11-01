@@ -27,6 +27,18 @@ except ImportError:
   import httplib
 
 
+class HMACAuth( requests.auth.AuthBase ):
+  def __init__( self, secret ):
+    self._hmachelper = hmaclib.JediHTTPHmacHelper( secret )
+
+  def __call__( self, req ):
+    self._hmachelper.SignRequestHeaders( req.headers,
+                                         req.method,
+                                         req.path_url,
+                                         req.body )
+    return req
+
+
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
                                             '..', 'jedihttp' ) )
 
@@ -60,16 +72,12 @@ def test_client_request_without_parameters():
   reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
   assert_that( good_start, reason )
 
-  headers = {}
-  hmachelper = hmaclib.JediHTTPHmacHelper( secret )
-  hmachelper.SignRequestHeaders( headers,
-                                 method = 'POST',
-                                 path = '/ready',
-                                 body = '' )
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( port ),
-                            headers = headers )
+                            auth = HMACAuth( secret ) )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
+
+  hmachelper = hmaclib.JediHTTPHmacHelper( secret )
   assert_that( hmachelper.IsResponseAuthenticated( response.headers,
                                                    response.content ) )
