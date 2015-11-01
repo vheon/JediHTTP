@@ -38,7 +38,7 @@ def teardown():
 
 
 @with_setup( teardown = teardown )
-def test_it_works():
+def test_client_request_without_parameters():
   port = 50000
   secret = "secret"
 
