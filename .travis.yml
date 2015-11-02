@@ -1,15 +1,33 @@
 language: python
 sudo: false
-os:
-  - linux
-env:
-  # TOXENV specify under which environment tox should launch the tests
-  # https://testrun.org/tox/latest/
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py33
+
+matrix:
+  include:
+    # TOXENV specify under which environment tox should launch the tests
+    # https://testrun.org/tox/latest/
+    - python: 2.6
+      env: TOXENV=py26
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.3
+      env: TOXENV=py33
+
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env: TOXENV=py26
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env: TOXENV=py27
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env: TOXENV=py33
 before_install: git submodule update --init --recursive
-install: pip install tox
-script: tox
+install: ./travis_install.sh
+script:
+  - source ~/.venv/bin/activate
+  - tox
 notifications:
   email: false
