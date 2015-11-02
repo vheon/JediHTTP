@@ -14,6 +14,8 @@ It's only purpose for me is to integrate it with [YouCompleteMe][] allowing to
 run [jedi][] under python3 and get python3 completions, so at the moment not
 all the API It has been wrapped.
 
+XXX(vheon): add docs for API and HMAC Auth
+
 ## Disclaimer
 
 I'm not a python programmer but I'm using this to experiment with python a bit.
