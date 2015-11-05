@@ -20,6 +20,7 @@ import json
 from argparse import ArgumentParser
 from waitress import serve
 import handlers
+import hmaclib
 from hmac_plugin import HmacPlugin
 
 
@@ -53,6 +54,7 @@ def Main():
   args = ParseArgs()
   hmac_secret = GetSecretFromTempFile( args.hmac_file_secret )
   handlers.app.install( HmacPlugin( hmac_secret ) )
+  handlers.app.config[ 'helper' ] = hmaclib.JediHTTPHmacHelper( hmac_secret )
   serve( handlers.app,
          host = args.host,
          port = args.port )

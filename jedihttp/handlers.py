@@ -98,14 +98,16 @@ def _GetJediScript( request_data ):
                       request_data[ 'path' ] )
 
 
-# XXX(vheon): apparently this is not covered by the hmac_plugin!!!
 @app.error( httplib.INTERNAL_SERVER_ERROR )
 def ErrorHandler( httperror ):
-  return _JsonResponse( {
+  body = _JsonResponse( {
     'exception': httperror.exception,
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
   } )
+  hmachelper = app.config[ 'helper' ]
+  hmachelper.SignResponseHeaders( response.headers, body )
+  return body
 
 
 def _JsonResponse( data ):

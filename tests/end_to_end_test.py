@@ -108,3 +108,27 @@ def test_client_request_with_parameters():
   hmachelper = hmaclib.JediHTTPHmacHelper( SECRET )
   assert_that( hmachelper.IsResponseAuthenticated( response.headers,
                                                    response.content ) )
+
+
+@with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
+def test_client_bad_request_with_parameters():
+  good_start, reason = wait_for_jedihttp_to_start()
+  assert_that( good_start, reason )
+
+  filepath = utils.fixture_filepath( 'goto.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 9,
+      'col': 1,
+      'path': filepath
+  }
+
+  response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
+                            json = request_data,
+                            auth = HMACAuth( SECRET ) )
+
+  assert_that( response.status_code, equal_to( httplib.INTERNAL_SERVER_ERROR ) )
+
+  hmachelper = hmaclib.JediHTTPHmacHelper( SECRET )
+  assert_that( hmachelper.IsResponseAuthenticated( response.headers,
+                                                   response.content ) )
