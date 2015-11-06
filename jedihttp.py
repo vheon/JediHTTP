@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import utils
+from jedihttp import utils
 utils.AddVendorFolderToSysPath()
 
 import sys
@@ -19,9 +19,9 @@ import os
 import json
 from argparse import ArgumentParser
 from waitress import serve
-import handlers
+from jedihttp import handlers
 import hmaclib
-from hmac_plugin import HmacPlugin
+from jedihttp.hmac_plugin import HmacPlugin
 
 
 def ParseArgs():

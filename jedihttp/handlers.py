@@ -11,13 +11,7 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
-# XXX(vheon): If I don't do this then some tests are going to fail because
-# handlers.py could not find utils.py; I don't know why though.
-try:
-  import utils
-except:
-  from . import utils
+from jedihttp import utils
 utils.AddVendorFolderToSysPath()
 
 import jedi

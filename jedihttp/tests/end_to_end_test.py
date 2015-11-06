@@ -40,7 +40,7 @@ class HMACAuth( requests.auth.AuthBase ):
 
 
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
-                                            '..', 'jedihttp' ) )
+                                            '..', '..', 'jedihttp.py' ) )
 
 PORT = 50000
 SECRET = 'secret'
