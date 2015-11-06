@@ -17,6 +17,7 @@ utils.AddVendorFolderToSysPath()
 import jedi
 import logging
 import json
+from jedihttp import hmaclib
 from bottle import response, request, Bottle
 
 try:
@@ -94,12 +95,13 @@ def _GetJediScript( request_data ):
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )
 def ErrorHandler( httperror ):
+  hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
+  hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
   body = _JsonResponse( {
     'exception': httperror.exception,
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
   } )
-  hmachelper = app.config[ 'helper' ]
   hmachelper.SignResponseHeaders( response.headers, body )
   return body
 

@@ -33,9 +33,13 @@ class HmacPlugin( object ):
   api = 2
 
 
-  def __init__( self, hmac_secret ):
-    self._hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
+  def __init__( self ):
     self._logger = logging.getLogger( __name__ )
+
+
+  def setup( self, app ):
+    hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
+    self._hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
 
 
   def __call__( self, callback ):
