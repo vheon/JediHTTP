@@ -95,13 +95,13 @@ def _GetJediScript( request_data ):
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )
 def ErrorHandler( httperror ):
-  hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
-  hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
   body = _JsonResponse( {
     'exception': httperror.exception,
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
   } )
+  hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
+  hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
   hmachelper.SignResponseHeaders( response.headers, body )
   return body
 
