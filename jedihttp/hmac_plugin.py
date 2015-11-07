@@ -75,5 +75,3 @@ class HmacPlugin( object ):
 def IsLocalRequest():
   host = urlparse( 'http://' + request.headers[ 'host' ] ).hostname
   return host == '127.0.0.1' or host == 'localhost'
-
-

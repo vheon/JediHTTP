@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
+
 import sys
 import json
 import hmac
@@ -79,8 +80,8 @@ class JediHTTPHmacHelper( object ):
     if not body:
       body = ''
     return self._Hmac( b''.join( ( self._Hmac( method ),
-                                  self._Hmac( path ),
-                                  self._Hmac( body ) ) ) )
+                                   self._Hmac( path ),
+                                   self._Hmac( body ) ) ) )
 
 
   def SignRequestHeaders( self, headers, method, path, body ):
@@ -138,4 +139,3 @@ else:
 
 def compare_digest( a, b ):
   return SecureStringsEqual( a, b )
-
