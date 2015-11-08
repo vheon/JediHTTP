@@ -101,9 +101,10 @@ def ErrorHandler( httperror ):
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
   } )
-  hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
-  hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
-  hmachelper.SignResponseHeaders( response.headers, body )
+  if 'jedihttp.hmac_secret' in app.config:
+    hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
+    hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
+    hmachelper.SignResponseHeaders( response.headers, body )
   return body
 
 

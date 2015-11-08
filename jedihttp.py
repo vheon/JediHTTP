@@ -29,7 +29,7 @@ def ParseArgs():
                        help = 'server host' )
   parser.add_argument( '--port', type = int, default = 0,
                        help = 'server port' )
-  parser.add_argument( '--hmac-file-secret', type = str, required = True,
+  parser.add_argument( '--hmac-file-secret', type = str,
                        help = 'file containing hmac secret' )
   return parser.parse_args()
 
@@ -51,9 +51,12 @@ def GetSecretFromTempFile( tfile ):
 
 def Main():
   args = ParseArgs()
-  hmac_secret = GetSecretFromTempFile( args.hmac_file_secret )
-  handlers.app.config[ 'jedihttp.hmac_secret' ] = hmac_secret
-  handlers.app.install( HmacPlugin() )
+
+  if args.hmac_file_secret:
+    hmac_secret = GetSecretFromTempFile( args.hmac_file_secret )
+    handlers.app.config[ 'jedihttp.hmac_secret' ] = hmac_secret
+    handlers.app.install( HmacPlugin() )
+
   serve( handlers.app,
          host = args.host,
          port = args.port )
