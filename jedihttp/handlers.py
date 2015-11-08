@@ -91,7 +91,7 @@ def _GetJediScript( request_data ):
   return jedi.Script( request_data[ 'source' ],
                       request_data[ 'line' ],
                       request_data[ 'col' ],
-                      request_data[ 'path' ] )
+                      request_data[ 'source_path' ] )
 
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )

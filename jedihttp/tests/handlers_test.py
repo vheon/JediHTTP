@@ -60,7 +60,7 @@ def test_completion():
       'source': open( filepath ).read(),
       'line': 7,
       'col': 2,
-      'path': filepath
+      'source_path': filepath
   }
 
   completions = app.post_json( '/completions',
@@ -78,7 +78,7 @@ def test_good_gotodefinition():
       'source': open( filepath ).read(),
       'line': 10,
       'col': 3,
-      'path': filepath
+      'source_path': filepath
   }
 
   definitions = app.post_json( '/gotodefinition',
@@ -115,7 +115,7 @@ def test_bad_gotodefinitions():
         'source': open( filepath ).read(),
         'line': line,
         'col': 1,
-        'path': filepath
+        'source_path': filepath
     }
     response = app.post_json( '/gotodefinition',request_data, expect_errors = True )
     assert_that( response.status_int, equal_to( 500 ) )
@@ -134,7 +134,7 @@ def test_good_gotoassignment():
       'source': open( filepath ).read(),
       'line': 20,
       'col': 1,
-      'path': filepath
+      'source_path': filepath
   }
 
   definitions = app.post_json( '/gotoassignment',
@@ -160,7 +160,7 @@ def test_py3():
       'source': open( filepath ).read(),
       'line': 7,
       'col': 11,
-      'path': filepath
+      'source_path': filepath
   }
 
   completions = app.post_json( '/completions',

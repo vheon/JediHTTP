@@ -96,7 +96,7 @@ def test_client_request_with_parameters():
       'source': open( filepath ).read(),
       'line': 10,
       'col': 3,
-      'path': filepath
+      'source_path': filepath
   }
 
   response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
@@ -120,7 +120,7 @@ def test_client_bad_request_with_parameters():
       'source': open( filepath ).read(),
       'line': 9,
       'col': 1,
-      'path': filepath
+      'source_path': filepath
   }
 
   response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
