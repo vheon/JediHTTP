@@ -14,18 +14,17 @@
 
 import sys
 from . import utils
+from .utils import with_jedihttp
 import requests
 import subprocess
 from jedihttp import hmaclib
 from os import path
-from nose.tools import with_setup
 from hamcrest import assert_that, equal_to
 
 try:
   from http import client as httplib
 except ImportError:
   import httplib
-
 
 class HMACAuth( requests.auth.AuthBase ):
   def __init__( self, secret ):
@@ -39,18 +38,16 @@ class HMACAuth( requests.auth.AuthBase ):
     return req
 
 
+PORT = 50000
+SECRET = 'secret'
 PATH_TO_JEDIHTTP = path.abspath( path.join( path.dirname( __file__ ),
                                             '..', '..', 'jedihttp.py' ) )
 
-PORT = 50000
-SECRET = 'secret'
-JEDIHTTP = None
 
-
-def wait_for_jedihttp_to_start():
-  line = JEDIHTTP.stdout.readline().decode( 'utf8' )
+def wait_for_jedihttp_to_start( jedihttp ):
+  line = jedihttp.stdout.readline().decode( 'utf8' )
   good_start = line.startswith( 'serving on' )
-  reason = JEDIHTTP.stdout.read().decode( 'utf8' ) if not good_start else ''
+  reason = jedihttp.stdout.read().decode( 'utf8' ) if not good_start else ''
   return good_start, reason
 
 
@@ -61,19 +58,18 @@ def setup_jedihttp():
                 PATH_TO_JEDIHTTP,
                 '--port', str( PORT ),
                 '--hmac-file-secret', hmac_file.name ]
-    global JEDIHTTP
-    JEDIHTTP = utils.SafePopen( command,
-                                stderr = subprocess.STDOUT,
-                                stdout = subprocess.PIPE )
+    return utils.SafePopen( command,
+                            stderr = subprocess.STDOUT,
+                            stdout = subprocess.PIPE )
 
 
-def teardown_jedihttp():
-  utils.TerminateProcess( JEDIHTTP.pid )
+def teardown_jedihttp( jedihttp ):
+  utils.TerminateProcess( jedihttp.pid )
 
 
-@with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
-def test_client_request_without_parameters():
-  good_start, reason = wait_for_jedihttp_to_start()
+@with_jedihttp( setup_jedihttp, teardown_jedihttp )
+def test_client_request_without_parameters( jedihttp ):
+  good_start, reason = wait_for_jedihttp_to_start( jedihttp )
   assert_that( good_start, reason )
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( PORT ),
@@ -86,9 +82,9 @@ def test_client_request_without_parameters():
                                                    response.content ) )
 
 
-@with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
-def test_client_request_with_parameters():
-  good_start, reason = wait_for_jedihttp_to_start()
+@with_jedihttp( setup_jedihttp, teardown_jedihttp )
+def test_client_request_with_parameters( jedihttp ):
+  good_start, reason = wait_for_jedihttp_to_start( jedihttp )
   assert_that( good_start, reason )
 
   filepath = utils.fixture_filepath( 'goto.py' )
@@ -110,9 +106,9 @@ def test_client_request_with_parameters():
                                                    response.content ) )
 
 
-@with_setup( setup = setup_jedihttp, teardown = teardown_jedihttp )
-def test_client_bad_request_with_parameters():
-  good_start, reason = wait_for_jedihttp_to_start()
+@with_jedihttp( setup_jedihttp, teardown_jedihttp )
+def test_client_bad_request_with_parameters( jedihttp ):
+  good_start, reason = wait_for_jedihttp_to_start( jedihttp )
   assert_that( good_start, reason )
 
   filepath = utils.fixture_filepath( 'goto.py' )

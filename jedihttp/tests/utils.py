@@ -27,6 +27,26 @@ except NameError:
   basestring = str
 
 
+def with_jedihttp( setup, teardown ):
+  """Decorator which pass the return value of the setup function to the test
+  function and to the teardown function."""
+  def decorate( func ):
+    class Namespace: pass
+    ns = Namespace()
+    ns.jedihttp = None
+
+    def test_wrapped(): func( ns.jedihttp )
+    def setup_wrapped(): ns.jedihttp = setup()
+    def teardown_wrapped(): teardown( ns.jedihttp )
+
+    test_wrapped.__name__ = func.__name__
+    test_wrapped.setup = setup_wrapped
+    test_wrapped.teardown = teardown_wrapped
+
+    return test_wrapped
+  return decorate
+
+
 def fixture_filepath( filename ):
   dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
   return os.path.join( dir_of_current_script, 'fixtures', filename )
