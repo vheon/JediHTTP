@@ -14,8 +14,7 @@
 
 from __future__ import absolute_import
 
-import sys
-from .utils import fixture_filepath
+from .utils import fixture_filepath, py3only
 from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
@@ -24,13 +23,6 @@ from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
 
 import bottle
 bottle.debug( True )
-
-try:
-  import unittest2 as unittest
-except ImportError:
-  import unittest
-
-py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
 
 
 def CompletionEntry( name ):

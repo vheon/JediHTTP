@@ -26,8 +26,23 @@ try:
 except NameError:
   basestring = str
 
+try:
+  import unittest2 as unittest
+except ImportError:
+  import unittest
 
-def with_jedihttp( setup, teardown ):
+py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
+py2only = unittest.skipIf( sys.version_info >= ( 3, 0 ), "Python 2.x only test" )
+
+
+def python3():
+  if OnWindows():
+    return os.path.abspath( '/Python33/python' )
+  else:
+    return 'python3'
+
+
+def with_jedihttp( setup, teardown, python = sys.executable ):
   """Decorator which pass the return value of the setup function to the test
   function and to the teardown function."""
   def decorate( func ):
@@ -36,7 +51,7 @@ def with_jedihttp( setup, teardown ):
     ns.jedihttp = None
 
     def test_wrapped(): func( ns.jedihttp )
-    def setup_wrapped(): ns.jedihttp = setup()
+    def setup_wrapped(): ns.jedihttp = setup( python )
     def teardown_wrapped(): teardown( ns.jedihttp )
 
     test_wrapped.__name__ = func.__name__

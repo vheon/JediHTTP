@@ -23,6 +23,8 @@ if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
   PYENV_ROOT="$HOME/.pyenv"
   PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
+  pyenv install 3.3.6
+  echo "3.3.6" >> .python-version
 
   case "${TOXENV}" in
     py26)
@@ -34,7 +36,6 @@ if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
       python get-pip.py --user
       ;;
     py33)
-      pyenv install 3.3.6
       pyenv global 3.3.6
       ;;
   esac
