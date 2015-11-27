@@ -11,6 +11,14 @@ matrix:
       env: TOXENV=py27
     - python: 3.3
       env: TOXENV=py33
+    - python: 2.6
+      env:
+        - TOXENV=py26
+        - CROSS_PYTHON_TESTS=true
+    - python: 2.7
+      env:
+        - TOXENV=py27
+        - CROSS_PYTHON_TESTS=true
 
     - language: generic
       os: osx

@@ -13,7 +13,7 @@
 
 
 from . import utils
-from .utils import with_jedihttp, py2only
+from .utils import with_jedihttp
 import requests
 import subprocess
 from jedihttp import hmaclib
@@ -50,9 +50,9 @@ def wait_for_jedihttp_to_start( jedihttp ):
   return good_start, reason
 
 
-def setup_jedihttp( python ):
+def setup_jedihttp():
   with hmaclib.TemporaryHmacSecretFile( SECRET ) as hmac_file:
-    command = [ python,
+    command = [ utils.python(),
                 '-u', # this flag makes stdout non buffered
                 PATH_TO_JEDIHTTP,
                 '--port', str( PORT ),
@@ -129,27 +129,4 @@ def test_client_bad_request_with_parameters( jedihttp ):
                                                    response.content ) )
 
 
-# XXX(vheon): improve test. Ask about python3 construct
-@py2only
-@with_jedihttp( setup_jedihttp, teardown_jedihttp, python = utils.python3() )
-def test_client_request_to_different_python_version( jedihttp ):
-  good_start, reason = wait_for_jedihttp_to_start( jedihttp )
-  assert_that( good_start, reason )
-
-  filepath = utils.fixture_filepath( 'goto.py' )
-  request_data = {
-      'source': open( filepath ).read(),
-      'line': 9,
-      'col': 1,
-      'source_path': filepath
-  }
-
-  response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
-                            json = request_data,
-                            auth = HMACAuth( SECRET ) )
-
-  assert_that( response.status_code, equal_to( httplib.INTERNAL_SERVER_ERROR ) )
-
-  hmachelper = hmaclib.JediHTTPHmacHelper( SECRET )
-  assert_that( hmachelper.IsResponseAuthenticated( response.headers,
-                                                   response.content ) )
+# XXX(vheon): improve test. Ask about python3 construct in completions

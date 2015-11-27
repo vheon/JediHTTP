@@ -32,7 +32,6 @@ except ImportError:
   import unittest
 
 py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
-py2only = unittest.skipIf( sys.version_info >= ( 3, 0 ), "Python 2.x only test" )
 
 
 def python3():
@@ -42,7 +41,14 @@ def python3():
     return 'python3'
 
 
-def with_jedihttp( setup, teardown, python = sys.executable ):
+def python():
+  if sys.version_info < ( 3, 0 ) and 'CROSS_PYTHON_TESTS' in os.environ:
+    return python3()
+  else:
+    return sys.executable
+
+
+def with_jedihttp( setup, teardown ):
   """Decorator which pass the return value of the setup function to the test
   function and to the teardown function."""
   def decorate( func ):
@@ -51,7 +57,7 @@ def with_jedihttp( setup, teardown, python = sys.executable ):
     ns.jedihttp = None
 
     def test_wrapped(): func( ns.jedihttp )
-    def setup_wrapped(): ns.jedihttp = setup( python )
+    def setup_wrapped(): ns.jedihttp = setup()
     def teardown_wrapped(): teardown( ns.jedihttp )
 
     test_wrapped.__name__ = func.__name__

@@ -45,6 +45,8 @@ def test_ready():
   ok_( app.post( '/ready' ) )
 
 
+# XXX(vheon): test for unicode, specially for python3
+# where encoding must be specified
 def test_completion():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'basic.py' )
