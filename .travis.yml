@@ -31,6 +31,18 @@ matrix:
     - language: generic
       os: osx
       osx_image: xcode7
+      env:
+        - TOXENV=py26
+        - CROSS_PYTHON_TESTS=true
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env:
+        - TOXENV=py27
+        - CROSS_PYTHON_TESTS=true
+    - language: generic
+      os: osx
+      osx_image: xcode7
       env: TOXENV=py33
 before_install: git submodule update --init --recursive
 install: ./travis/install.sh
