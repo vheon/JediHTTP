@@ -25,6 +25,18 @@ environment:
       PYTHON_ARCH: "64"
       TOXENV: "py27"
 
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7.x"
+      PYTHON_ARCH: "32"
+      TOXENV: "py27"
+      CROSS_PYTHON_TESTS: "true"
+
+    - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: "2.7.x"
+      PYTHON_ARCH: "64"
+      TOXENV: "py27"
+      CROSS_PYTHON_TESTS: "true"
+
     - PYTHON: "C:\\Python33"
       PYTHON_VERSION: "3.3.x"
       PYTHON_ARCH: "32"
