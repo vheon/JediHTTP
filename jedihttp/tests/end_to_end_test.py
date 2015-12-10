@@ -13,7 +13,7 @@
 
 
 from . import utils
-from .utils import with_jedihttp
+from .utils import with_jedihttp, py2only
 import requests
 import subprocess
 from jedihttp import hmaclib
@@ -129,4 +129,26 @@ def test_client_bad_request_with_parameters( jedihttp ):
                                                    response.content ) )
 
 
-# XXX(vheon): improve test. Ask about python3 construct in completions
+@py2only
+@with_jedihttp( setup_jedihttp, teardown_jedihttp )
+def test_client_python3_specific_syntax_completion( jedihttp ):
+  good_start, reason = wait_for_jedihttp_to_start( jedihttp )
+  assert_that( good_start, reason )
+
+  filepath = utils.fixture_filepath( 'py3.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 19,
+      'col': 11,
+      'source_path': filepath
+  }
+
+  response = requests.post( 'http://127.0.0.1:{0}/completions'.format( PORT ),
+                            json = request_data,
+                            auth = HMACAuth( SECRET ) )
+
+  assert_that( response.status_code, equal_to( httplib.OK ) )
+
+  hmachelper = hmaclib.JediHTTPHmacHelper( SECRET )
+  assert_that( hmachelper.IsResponseAuthenticated( response.headers,
+                                                   response.content ) )

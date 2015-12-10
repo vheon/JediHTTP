@@ -152,7 +152,7 @@ def test_py3():
   filepath = fixture_filepath( 'py3.py' )
   request_data = {
       'source': open( filepath ).read(),
-      'line': 7,
+      'line': 19,
       'col': 11,
       'source_path': filepath
   }
