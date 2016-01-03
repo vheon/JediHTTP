@@ -18,3 +18,7 @@ _list = [ 1, None, alias ]
 inception = _list[ 2 ]
 
 inception()
+
+
+class Class():
+  bar = 1

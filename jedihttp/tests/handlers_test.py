@@ -108,7 +108,7 @@ def test_bad_gotodefinitions():
     request_data = {
         'source': open( filepath ).read(),
         'line': line,
-        'col': 1,
+        'col': 3,
         'source_path': filepath
     }
     response = app.post_json( '/gotodefinition',request_data, expect_errors = True )
@@ -116,8 +116,9 @@ def test_bad_gotodefinitions():
 
 
   # line 9 is a blank line
+  # line 24 could not get us a definition
   # line 100 do not exists
-  for line in [ 9, 100 ]:
+  for line in [ 9, 24, 100 ]:
     yield gotodefinition_token_under_line, line
 
 
