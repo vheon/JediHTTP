@@ -6,7 +6,7 @@ def f():
 class C:
   """ Class Documentation"""
   pass
-
+        
 variable = f if random.choice( [ 0, 1 ] ) else C
 
 

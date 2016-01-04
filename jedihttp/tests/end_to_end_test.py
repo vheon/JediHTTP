@@ -113,7 +113,7 @@ def test_client_bad_request_with_parameters( jedihttp ):
   filepath = utils.fixture_filepath( 'goto.py' )
   request_data = {
       'source': open( filepath ).read(),
-      'line': 9,
+      'line': 100,
       'col': 1,
       'source_path': filepath
   }

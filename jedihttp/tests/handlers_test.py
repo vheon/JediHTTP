@@ -19,7 +19,8 @@ from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
 from hamcrest import ( assert_that, only_contains, all_of, is_not, has_key,
-                       has_item, has_items, has_entry, has_length, equal_to )
+                       has_item, has_items, has_entry, has_length, equal_to,
+                       is_, empty )
 
 import bottle
 bottle.debug( True )
@@ -101,24 +102,30 @@ def test_good_gotodefinition():
                               } ) )
 
 
-def test_bad_gotodefinitions():
-  def gotodefinition_token_under_line( line ):
-    app = TestApp( handlers.app )
-    filepath = fixture_filepath( 'goto.py' )
-    request_data = {
-        'source': open( filepath ).read(),
-        'line': line,
-        'col': 1,
-        'source_path': filepath
-    }
-    response = app.post_json( '/gotodefinition',request_data, expect_errors = True )
-    assert_that( response.status_int, equal_to( 500 ) )
+def test_bad_gotodefinitions_blank_line():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'goto.py' )
+  request_data = {
+    'source': open( filepath ).read(),
+    'line': 9,
+    'col': 1,
+    'source_path': filepath
+  }
+  definitions = app.post_json( '/gotodefinition', request_data ).json[ 'definitions' ]
+  assert_that( definitions, is_( empty() ) )
 
 
-  # line 9 is a blank line
-  # line 100 do not exists
-  for line in [ 9, 100 ]:
-    yield gotodefinition_token_under_line, line
+def test_bad_gotodefinitions_not_on_valid_position():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'goto.py' )
+  request_data = {
+    'source': open( filepath ).read(),
+    'line': 100,
+    'col': 1,
+    'source_path': filepath
+  }
+  response = app.post_json( '/gotodefinition', request_data, expect_errors = True )
+  assert_that( response.status_int, equal_to( 500 ) )
 
 
 def test_good_gotoassignment():
