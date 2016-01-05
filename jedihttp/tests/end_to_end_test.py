@@ -25,15 +25,15 @@ try:
 except ImportError:
   import httplib
 
-class HMACAuth( requests.auth.AuthBase ):
+class HmacAuth( requests.auth.AuthBase ):
   def __init__( self, secret ):
-    self._hmachelper = hmaclib.JediHTTPHmacHelper( secret )
+    self._hmac_helper = hmaclib.JediHTTPHmacHelper( secret )
 
   def __call__( self, req ):
-    self._hmachelper.SignRequestHeaders( req.headers,
-                                         req.method,
-                                         req.path_url,
-                                         req.body )
+    self._hmac_helper.SignRequestHeaders( req.headers,
+                                          req.method,
+                                          req.path_url,
+                                          req.body )
     return req
 
 
@@ -72,7 +72,7 @@ def test_client_request_without_parameters( jedihttp ):
   assert_that( good_start, reason )
 
   response = requests.post( 'http://127.0.0.1:{0}/ready'.format( PORT ),
-                            auth = HMACAuth( SECRET ) )
+                            auth = HmacAuth( SECRET ) )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
 
@@ -96,7 +96,7 @@ def test_client_request_with_parameters( jedihttp ):
 
   response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
                             json = request_data,
-                            auth = HMACAuth( SECRET ) )
+                            auth = HmacAuth( SECRET ) )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
 
@@ -120,7 +120,7 @@ def test_client_bad_request_with_parameters( jedihttp ):
 
   response = requests.post( 'http://127.0.0.1:{0}/gotodefinition'.format( PORT ),
                             json = request_data,
-                            auth = HMACAuth( SECRET ) )
+                            auth = HmacAuth( SECRET ) )
 
   assert_that( response.status_code, equal_to( httplib.INTERNAL_SERVER_ERROR ) )
 
@@ -145,7 +145,7 @@ def test_client_python3_specific_syntax_completion( jedihttp ):
 
   response = requests.post( 'http://127.0.0.1:{0}/completions'.format( PORT ),
                             json = request_data,
-                            auth = HMACAuth( SECRET ) )
+                            auth = HmacAuth( SECRET ) )
 
   assert_that( response.status_code, equal_to( httplib.OK ) )
 
