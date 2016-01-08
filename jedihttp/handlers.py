@@ -63,17 +63,24 @@ def completions():
 def gotodefinition():
   logger.debug( 'received /gotodefinition request' )
   script = _GetJediScript( request.json )
-  return _JsonResponse( _FormatGoToDefinitions( script.goto_definitions() ) )
+  return _JsonResponse( _FormatDefinitions( script.goto_definitions() ) )
 
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
   logger.debug( 'received /gotoassignment request' )
   script = _GetJediScript( request.json )
-  return _JsonResponse( _FormatGoToDefinitions( script.goto_assignments() ) )
+  return _JsonResponse( _FormatDefinitions( script.goto_assignments() ) )
 
 
-def _FormatGoToDefinitions( definitions ):
+@app.post( '/usages' )
+def usages():
+  logger.debug( 'received /usages request' )
+  script = _GetJediScript( request.json )
+  return _JsonResponse( _FormatDefinitions( script.usages() ) )
+
+
+def _FormatDefinitions( definitions ):
   return {
       'definitions': [ {
         'module_path':       definition.module_path,

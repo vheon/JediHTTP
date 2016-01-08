@@ -153,6 +153,59 @@ def test_good_gotoassignment():
                             } ) )
 
 
+def test_usages():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'usages.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 8,
+      'col': 5,
+      'source_path': filepath
+  }
+
+  definitions = app.post_json( '/usages',
+                               request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 4 ) )
+  assert_that( definitions, has_items(
+                              {
+                                'description': 'def f',
+                                'in_builtin_module': False,
+                                'is_keyword': False,
+                                'module_path': filepath,
+                                'column': 4,
+                                'line': 1,
+                                'docstring': 'f()\n\nModule method docs\nAre dedented, like you might expect'
+                              },
+                              {
+                                'description': 'a = f()',
+                                'in_builtin_module': False,
+                                'is_keyword': False,
+                                'module_path': filepath,
+                                'column': 4,
+                                'line': 6,
+                                'docstring': ''
+                              },
+                              {
+                                'description': 'b = f()',
+                                'in_builtin_module': False,
+                                'is_keyword': False,
+                                'module_path': filepath,
+                                'column': 4,
+                                'line': 7,
+                                'docstring': ''
+                              },
+  {
+                                'description': 'c = f()',
+                                'in_builtin_module': False,
+                                'is_keyword': False,
+                                'module_path': filepath,
+                                'column': 4,
+                                'line': 8,
+                                'docstring': ''
+                              } ) )
+
+
 @py3only
 def test_py3():
   app = TestApp( handlers.app )
