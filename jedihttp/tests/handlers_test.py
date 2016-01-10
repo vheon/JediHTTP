@@ -195,7 +195,7 @@ def test_usages():
                                 'line': 7,
                                 'docstring': ''
                               },
-  {
+                              {
                                 'description': 'c = f()',
                                 'in_builtin_module': False,
                                 'is_keyword': False,

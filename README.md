@@ -145,6 +145,55 @@ Response:
 }
 ```
 
+### POST /usages
+
+Parameters:
+
+```javascript
+{
+  "source": "def f():\n  pass\n\na = f()\nb = f()",
+  "line": 1,
+  "col": 4,
+  "path": "/home/user/code/src/file.py"
+}
+```
+
+Response:
+
+```javascript
+{
+  "definitions": [
+    {
+      'description': 'def f',
+      'in_builtin_module': False,
+      'is_keyword': False,
+      'module_path': '/home/user/code/src/file.py',
+      'column': 4,
+      'line': 1,
+      'docstring': ''
+    },
+    {
+      'description': 'a = f()',
+      'in_builtin_module': False,
+      'is_keyword': False,
+      'module_path': /home/user/code/src/file.py,
+      'column': 4,
+      'line': 4,
+      'docstring': ''
+    },
+    {
+      'description': 'b = f()',
+      'in_builtin_module': False,
+      'is_keyword': False,
+      'module_path': '/home/user/code/src/file.py',
+      'column': 4,
+      'line': 5,
+      'docstring': ''
+    }
+  ]
+}
+```
+
 ### In case of errors
 
 Response:
