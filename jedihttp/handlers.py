@@ -18,6 +18,7 @@ utils.AddVendorFolderToSysPath()
 import jedi
 import logging
 import json
+import bottle
 from jedihttp import hmaclib
 from bottle import response, request, Bottle
 
@@ -26,6 +27,10 @@ try:
 except ImportError:
   import httplib
 
+
+# num bytes for the request body buffer; request.json only works if the request
+# size is less than this
+bottle.Request.MEMFILE_MAX = 1000 * 1024
 
 logger = logging.getLogger( __name__ )
 app = Bottle( __name__ )
