@@ -17,11 +17,11 @@ from bottle import request, response, abort
 from jedihttp import hmaclib
 
 try:
-  from urllib.parse import urlparse
-  from http import client as httplib
-except ImportError:
   from urlparse import urlparse
   import httplib
+except ImportError:
+  from urllib.parse import urlparse
+  from http import client as httplib
 
 
 class HmacPlugin( object ):

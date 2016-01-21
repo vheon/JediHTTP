@@ -23,9 +23,9 @@ from jedihttp import hmaclib
 from bottle import response, request, Bottle
 
 try:
-  from http import client as httplib
-except ImportError:
   import httplib
+except ImportError:
+  from http import client as httplib
 
 
 # num bytes for the request body buffer; request.json only works if the request
