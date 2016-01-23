@@ -7,3 +7,6 @@
 [submodule "vendor/bottle"]
 	path = vendor/bottle
 	url = https://github.com/bottlepy/bottle
+[submodule "vendor/argparse"]
+	path = vendor/argparse
+	url = https://github.com/bewest/argparse
