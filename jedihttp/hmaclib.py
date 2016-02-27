@@ -31,7 +31,8 @@ def TemporaryHmacSecretFile( secret ):
     The JediHTTP Server as soon as it reads the hmac secret will remove the file
   """
   hmac_file = tempfile.NamedTemporaryFile( 'w', delete = False )
-  json.dump( { 'hmac_secret': secret }, hmac_file )
+  encoded_secret = decode_string( b64encode( encode_string( secret ) ) )
+  json.dump( { 'hmac_secret': encoded_secret }, hmac_file )
   return hmac_file
 
 

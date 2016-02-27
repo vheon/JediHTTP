@@ -17,6 +17,7 @@ utils.AddVendorFolderToSysPath()
 import sys
 import os
 import json
+from base64 import b64decode
 from argparse import ArgumentParser
 from waitress import serve
 from jedihttp import handlers
@@ -54,7 +55,7 @@ def Main():
 
   if args.hmac_file_secret:
     hmac_secret = GetSecretFromTempFile( args.hmac_file_secret )
-    handlers.app.config[ 'jedihttp.hmac_secret' ] = hmac_secret
+    handlers.app.config[ 'jedihttp.hmac_secret' ] = b64decode( hmac_secret )
     handlers.app.install( HmacPlugin() )
 
   serve( handlers.app,
