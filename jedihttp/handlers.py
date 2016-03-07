@@ -54,12 +54,12 @@ def completions():
   script = _GetJediScript( request.json )
   return _JsonResponse( {
       'completions': [ {
-        'name':        completion.name,
-        'description': completion.description,
-        'docstring':   completion.docstring(),
         'module_path': completion.module_path,
+        'name':        completion.name,
         'line':        completion.line,
-        'column':      completion.column
+        'column':      completion.column,
+        'docstring':   completion.docstring(),
+        'description': completion.description
       } for completion in script.completions() ]
   } )
 
@@ -89,12 +89,13 @@ def _FormatDefinitions( definitions ):
   return {
       'definitions': [ {
         'module_path':       definition.module_path,
+        'name':              definition.name,
+        'in_builtin_module': definition.in_builtin_module(),
         'line':              definition.line,
         'column':            definition.column,
-        'in_builtin_module': definition.in_builtin_module(),
-        'is_keyword':        definition.is_keyword,
+        'docstring':         definition.docstring(),
         'description':       definition.description,
-        'docstring':         definition.docstring()
+        'is_keyword':        definition.is_keyword
       } for definition in definitions ]
   }
 

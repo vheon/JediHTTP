@@ -82,23 +82,25 @@ def test_good_gotodefinition():
   assert_that( definitions, has_length( 2 ) )
   assert_that( definitions, has_items(
                               {
-                                'description': 'def f',
-                                'line': 1,
-                                'in_builtin_module': False,
-                                'column': 4,
-                                'is_keyword': False,
                                 'module_path': filepath,
+                                'name': 'f',
+                                'in_builtin_module': False,
+                                'line': 1,
+                                'column': 4,
                                 'docstring': 'f()\n\nModule method docs\nAre '
-                                             'dedented, like you might expect'
+                                             'dedented, like you might expect',
+                                'description': 'def f',
+                                'is_keyword': False,
                               },
                               {
-                                'description': 'class C',
-                                'line': 6,
-                                'in_builtin_module': False,
-                                'column': 6,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'docstring': 'Class Documentation'
+                                'name': 'C',
+                                'in_builtin_module': False,
+                                'line': 6,
+                                'column': 6,
+                                'docstring': 'Class Documentation',
+                                'description': 'class C',
+                                'is_keyword': False
                               } ) )
 
 
@@ -143,13 +145,14 @@ def test_good_gotoassignment():
 
   assert_that( definitions, has_length( 1 ) )
   assert_that( definitions, has_item( {
-                                'in_builtin_module': False,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'column': 0,
+                                'name': 'inception',
+                                'in_builtin_module': False,
                                 'line': 18,
+                                'column': 0,
+                                'docstring': '',
                                 'description': 'inception = _list[ 2 ]',
-                                'docstring': ''
+                                'is_keyword': False
                             } ) )
 
 
@@ -169,40 +172,44 @@ def test_usages():
   assert_that( definitions, has_length( 4 ) )
   assert_that( definitions, has_items(
                               {
-                                'description': 'def f',
-                                'in_builtin_module': False,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'column': 4,
+                                'name': 'f',
+                                'in_builtin_module': False,
                                 'line': 1,
-                                'docstring': 'f()\n\nModule method docs\nAre dedented, like you might expect'
+                                'column': 4,
+                                'docstring': 'f()\n\nModule method docs\nAre dedented, like you might expect',
+                                'description': 'def f',
+                                'is_keyword': False
                               },
                               {
-                                'description': 'a = f()',
-                                'in_builtin_module': False,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'column': 4,
+                                'name': 'f',
+                                'in_builtin_module': False,
                                 'line': 6,
-                                'docstring': ''
+                                'column': 4,
+                                'description': 'a = f()',
+                                'docstring': '',
+                                'is_keyword': False
                               },
                               {
-                                'description': 'b = f()',
-                                'in_builtin_module': False,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'column': 4,
+                                'name': 'f',
+                                'in_builtin_module': False,
                                 'line': 7,
-                                'docstring': ''
+                                'column': 4,
+                                'description': 'b = f()',
+                                'docstring': '',
+                                'is_keyword': False
                               },
                               {
-                                'description': 'c = f()',
-                                'in_builtin_module': False,
-                                'is_keyword': False,
                                 'module_path': filepath,
-                                'column': 4,
+                                'name': 'f',
+                                'in_builtin_module': False,
                                 'line': 8,
-                                'docstring': ''
+                                'column': 4,
+                                'description': 'c = f()',
+                                'docstring': '',
+                                'is_keyword': False
                               } ) )
 
 
