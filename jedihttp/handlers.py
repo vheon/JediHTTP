@@ -59,7 +59,8 @@ def completions():
         'line':        completion.line,
         'column':      completion.column,
         'docstring':   completion.docstring(),
-        'description': completion.description
+        'description': completion.description,
+        'type':        completion.type
       } for completion in script.completions() ]
   } )
 
