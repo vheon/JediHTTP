@@ -30,6 +30,12 @@ If not specified, 127.0.0.1 is used.
 
 Listen on PORT. If not specified, will use any available port.
 
+#### `--log` LEVEL
+
+Set logging level to LEVEL. Available levels, from most verbose to least
+verbose, are: `debug`, `info`, `warning`, `error`, and `critical`. Default value is
+`info`.
+
 #### `--hmac-secret-file` PATH
 
 PATH is the path of a JSON file containing a key named `hmac_secret`. Its value
