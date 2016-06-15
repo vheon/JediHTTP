@@ -21,6 +21,7 @@ import json
 import bottle
 from jedihttp import hmaclib
 from bottle import response, request, Bottle
+from threading import Lock
 
 try:
   import httplib
@@ -34,6 +35,9 @@ bottle.Request.MEMFILE_MAX = 1000 * 1024
 
 logger = logging.getLogger( __name__ )
 app = Bottle( __name__ )
+
+# Jedi is not thread safe.
+jedi_lock = Lock()
 
 
 @app.post( '/healthy' )
@@ -51,8 +55,9 @@ def ready():
 @app.post( '/completions' )
 def completions():
   logger.debug( 'received /completions request' )
-  script = _GetJediScript( request.json )
-  return _JsonResponse( {
+  with jedi_lock:
+    script = _GetJediScript( request.json )
+    response = {
       'completions': [ {
         'module_path': completion.module_path,
         'name':        completion.name,
@@ -62,28 +67,35 @@ def completions():
         'description': completion.description,
         'type':        completion.type
       } for completion in script.completions() ]
-  } )
+    }
+  return _JsonResponse( response )
 
 
 @app.post( '/gotodefinition' )
 def gotodefinition():
   logger.debug( 'received /gotodefinition request' )
-  script = _GetJediScript( request.json )
-  return _JsonResponse( _FormatDefinitions( script.goto_definitions() ) )
+  with jedi_lock:
+    script = _GetJediScript( request.json )
+    response = _FormatDefinitions( script.goto_definitions() )
+  return _JsonResponse( response )
 
 
 @app.post( '/gotoassignment' )
 def gotoassignments():
   logger.debug( 'received /gotoassignment request' )
-  script = _GetJediScript( request.json )
-  return _JsonResponse( _FormatDefinitions( script.goto_assignments() ) )
+  with jedi_lock:
+    script = _GetJediScript( request.json )
+    response = _FormatDefinitions( script.goto_assignments() )
+  return _JsonResponse( response )
 
 
 @app.post( '/usages' )
 def usages():
   logger.debug( 'received /usages request' )
-  script = _GetJediScript( request.json )
-  return _JsonResponse( _FormatDefinitions( script.usages() ) )
+  with jedi_lock:
+    script = _GetJediScript( request.json )
+    response = _FormatDefinitions( script.usages() )
+  return _JsonResponse( response )
 
 
 def _FormatDefinitions( definitions ):
