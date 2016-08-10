@@ -20,6 +20,11 @@ matrix:
         - TOXENV=py27
         - CROSS_PYTHON_TESTS=true
 
+    - python: 2.7
+      env: TOXENV=flake8
+    - python: 3.3
+      env: TOXENV=flake8
+
     - language: generic
       os: osx
       osx_image: xcode7
@@ -44,6 +49,15 @@ matrix:
       os: osx
       osx_image: xcode7
       env: TOXENV=py33
+
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env: TOXENV=flake8
+    - language: generic
+      os: osx
+      osx_image: xcode7
+      env: TOXENV=flake8
 before_install: git submodule update --init --recursive
 install: ./travis/install.sh
 script: ./travis/run.sh
