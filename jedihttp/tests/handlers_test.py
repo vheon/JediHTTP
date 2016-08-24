@@ -156,6 +156,70 @@ def test_good_gotoassignment():
                             } ) )
 
 
+def test_good_gotoassignment_do_not_follow_imports():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'follow_imports', 'importer.py' )
+  request_data = {
+      'source': open( filepath ).read(),
+      'line': 3,
+      'col': 9,
+      'source_path': filepath
+  }
+  expected_definition = {
+      'module_path': filepath,
+      'name': 'imported_function',
+      'in_builtin_module': False,
+      'line': 1,
+      'column': 21,
+      'docstring': '',
+      'description': 'from imported '
+      'import imported_function',
+      'is_keyword': False
+  }
+
+  definitions = app.post_json( '/gotoassignment',
+                               request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 1 ) )
+  assert_that( definitions, has_item( expected_definition ) )
+
+  request_data[ 'follow_imports' ] = False
+
+  definitions = app.post_json( '/gotoassignment',
+                               request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 1 ) )
+  assert_that( definitions, has_item( expected_definition ) )
+
+
+def test_good_gotoassignment_follow_imports():
+  app = TestApp( handlers.app )
+  importer_filepath = fixture_filepath( 'follow_imports', 'importer.py' )
+  imported_filepath = fixture_filepath( 'follow_imports', 'imported.py' )
+  request_data = {
+      'source': open( importer_filepath ).read(),
+      'line': 3,
+      'col': 9,
+      'source_path': importer_filepath,
+      'follow_imports': True
+  }
+
+  definitions = app.post_json( '/gotoassignment',
+                               request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, has_length( 1 ) )
+  assert_that( definitions, has_item( {
+                                'module_path': imported_filepath,
+                                'name': 'imported_function',
+                                'in_builtin_module': False,
+                                'line': 1,
+                                'column': 4,
+                                'docstring': 'imported_function()\n\n',
+                                'description': 'def imported_function',
+                                'is_keyword': False
+                            } ) )
+
+
 def test_usages():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'usages.py' )

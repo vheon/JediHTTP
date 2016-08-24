@@ -84,8 +84,11 @@ def gotodefinition():
 def gotoassignments():
   logger.debug( 'received /gotoassignment request' )
   with jedi_lock:
-    script = _GetJediScript( request.json )
-    response = _FormatDefinitions( script.goto_assignments() )
+    request_json = request.json
+    follow_imports = ( 'follow_imports' in request_json and
+                       request_json[ 'follow_imports' ] )
+    script = _GetJediScript( request_json )
+    response = _FormatDefinitions( script.goto_assignments( follow_imports ) )
   return _JsonResponse( response )
 
 

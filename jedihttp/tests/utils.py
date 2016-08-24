@@ -69,9 +69,9 @@ def with_jedihttp( setup, teardown ):
   return decorate
 
 
-def fixture_filepath( filename ):
+def fixture_filepath( *components ):
   dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-  return os.path.join( dir_of_current_script, 'fixtures', filename )
+  return os.path.join( dir_of_current_script, 'fixtures', *components )
 
 
 # Creation flag to disable creating a console window on Windows. See

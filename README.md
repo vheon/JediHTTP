@@ -129,7 +129,8 @@ Parameters:
   "source": "def f():\n  pass",
   "line": 1,
   "col": 0,
-  "path": "/home/user/code/src/file.py"
+  "path": "/home/user/code/src/file.py",
+  "follow_imports": true, // Optional (default is false)
 }
 ```
 
