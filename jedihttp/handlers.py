@@ -15,12 +15,14 @@
 from jedihttp import utils
 utils.AddVendorFolderToSysPath()
 
+import contextlib
 import jedi
 import logging
 import json
 import bottle
-from jedihttp import hmaclib
 from bottle import response, request, Bottle
+from jedihttp import hmaclib
+from jedihttp.compatibility import iteritems
 from threading import Lock
 
 try:
@@ -39,6 +41,26 @@ app = Bottle( __name__ )
 # Jedi is not thread safe.
 jedi_lock = Lock()
 
+# For efficiency, we store the default values of the global Jedi settings. See
+# https://jedi.readthedocs.io/en/latest/docs/settings.html
+default_settings = {
+    'case_insensitive_completion'     :
+        jedi.settings.case_insensitive_completion,
+    'add_bracket_after_function'      :
+        jedi.settings.add_bracket_after_function,
+    'no_completion_duplicates'        : jedi.settings.no_completion_duplicates,
+    'cache_directory'                 : jedi.settings.cache_directory,
+    'use_filesystem_cache'            : jedi.settings.cache_directory,
+    'fast_parser'                     : jedi.settings.fast_parser,
+    'dynamic_array_additions'         : jedi.settings.dynamic_array_additions,
+    'dynamic_params'                  : jedi.settings.dynamic_params,
+    'dynamic_params_for_other_modules':
+        jedi.settings.dynamic_params_for_other_modules,
+    'additional_dynamic_modules'      :
+        jedi.settings.additional_dynamic_modules,
+    'auto_import_modules'             : jedi.settings.auto_import_modules
+}
+
 
 @app.post( '/healthy' )
 def healthy():
@@ -56,8 +78,10 @@ def ready():
 def completions():
   logger.debug( 'received /completions request' )
   with jedi_lock:
-    script = _GetJediScript( request.json )
-    response = _FormatCompletions( script.completions() )
+    request_json = request.json
+    with _CustomSettings( request_json ):
+      script = _GetJediScript( request_json )
+      response = _FormatCompletions( script.completions() )
   return _JsonResponse( response )
 
 
@@ -65,8 +89,10 @@ def completions():
 def gotodefinition():
   logger.debug( 'received /gotodefinition request' )
   with jedi_lock:
-    script = _GetJediScript( request.json )
-    response = _FormatDefinitions( script.goto_definitions() )
+    request_json = request.json
+    with _CustomSettings( request_json ):
+      script = _GetJediScript( request_json )
+      response = _FormatDefinitions( script.goto_definitions() )
   return _JsonResponse( response )
 
 
@@ -75,10 +101,10 @@ def gotoassignments():
   logger.debug( 'received /gotoassignment request' )
   with jedi_lock:
     request_json = request.json
-    follow_imports = ( 'follow_imports' in request_json and
-                       request_json[ 'follow_imports' ] )
-    script = _GetJediScript( request_json )
-    response = _FormatDefinitions( script.goto_assignments( follow_imports ) )
+    follow_imports = request_json.get( 'follow_imports', False )
+    with _CustomSettings( request_json ):
+      script = _GetJediScript( request_json )
+      response = _FormatDefinitions( script.goto_assignments( follow_imports ) )
   return _JsonResponse( response )
 
 
@@ -86,8 +112,10 @@ def gotoassignments():
 def usages():
   logger.debug( 'received /usages request' )
   with jedi_lock:
-    script = _GetJediScript( request.json )
-    response = _FormatDefinitions( script.usages() )
+    request_json = request.json
+    with _CustomSettings( request_json ):
+      script = _GetJediScript( request_json )
+      response = _FormatDefinitions( script.usages() )
   return _JsonResponse( response )
 
 
@@ -95,8 +123,10 @@ def usages():
 def names():
   logger.debug( 'received /names request' )
   with jedi_lock:
-    definitions = _GetJediNames( request.json )
-    response = _FormatDefinitions( definitions )
+    request_json = request.json
+    with _CustomSettings( request_json ):
+      definitions = _GetJediNames( request_json )
+      response = _FormatDefinitions( definitions )
   return _JsonResponse( response )
 
 
@@ -104,7 +134,9 @@ def names():
 def preload_module():
   logger.debug( 'received /preload_module request' )
   with jedi_lock:
-    jedi.preload_module( *request.json[ 'modules' ] )
+    request_json = request.json
+    with _CustomSettings( request_json ):
+      jedi.preload_module( *request_json[ 'modules' ] )
   return _JsonResponse( True )
 
 
@@ -152,6 +184,24 @@ def _GetJediNames( request_data ):
                      all_scopes = request_data.get( 'all_scopes', False ),
                      definitions = request_data.get( 'definitions', True ),
                      references = request_data.get( 'references', False ) )
+
+
+def _SetJediSettings( settings ):
+  for name, value in iteritems( settings ):
+    setattr( jedi.settings, name, value )
+
+
+@contextlib.contextmanager
+def _CustomSettings( request_data ):
+  settings = request_data.get( 'settings' )
+  if not settings:
+    yield
+    return
+  try:
+    _SetJediSettings( settings )
+    yield
+  finally:
+    _SetJediSettings( default_settings )
 
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )

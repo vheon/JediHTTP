@@ -58,3 +58,15 @@ else:
 
 def compare_digest( a, b ):
   return SecureStringsEqual( a, b )
+
+
+try:
+  dict.iteritems
+except AttributeError:
+  # Python 3
+  def iteritems( dictionary ):
+    return iter( dictionary.items() )
+else:
+  # Python 2
+  def iteritems( dictionary ):
+    return dictionary.iteritems()

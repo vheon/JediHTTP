@@ -33,8 +33,8 @@ Listen on PORT. If not specified, will use any available port.
 #### `--log` LEVEL
 
 Set logging level to LEVEL. Available levels, from most verbose to least
-verbose, are: `debug`, `info`, `warning`, `error`, and `critical`. Default value is
-`info`.
+verbose, are: `debug`, `info`, `warning`, `error`, and `critical`. Default value
+is `info`.
 
 #### `--hmac-secret-file` PATH
 
@@ -67,7 +67,11 @@ Parameters:
   "source": "def f():\n  pass",
   "line": 1,
   "col": 0,
-  "path": "/home/user/code/src/file.py"
+  "path": "/home/user/code/src/file.py",
+  "settings": {
+    "add_bracket_after_function": true,
+    ...
+  } // Jedi settings. Optional.
 }
 ```
 
@@ -99,7 +103,8 @@ Parameters:
   "source": "def f():\n  pass",
   "line": 1,
   "col": 0,
-  "path": "/home/user/code/src/file.py"
+  "path": "/home/user/code/src/file.py",
+  "settings": {} // Jedi settings. Optional.
 }
 ```
 
@@ -111,6 +116,7 @@ Response:
     {
       "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module.
       "name": "name", // Name of variable/function/class/module.
+      "type": "type", // Type of the completion (module, class, instance, etc.)
       "line": 3,  // The line where the definition occurs (starting with 1).
       "column": 1, // The column where the definition occurs (starting with 0).
       "in_builtin_module": false, // Whether this is a builtin module.
@@ -134,7 +140,8 @@ Parameters:
   "line": 1,
   "col": 0,
   "path": "/home/user/code/src/file.py",
-  "follow_imports": true, // Optional (default is false)
+  "follow_imports": true, // Optional (default is false).
+  "settings": {} // Jedi settings. Optional.
 }
 ```
 
@@ -146,6 +153,7 @@ Response:
     {
       "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module.
       "name": "name", // Name of variable/function/class/module.
+      "type": "type", // Type of the completion (module, class, instance, etc.)
       "line": 3,  // The line where the definition occurs (starting with 1).
       "column": 1 // The column where the definition occurs (starting with 0).
       "in_builtin_module": false, // Whether this is a builtin module.
@@ -168,7 +176,10 @@ Parameters:
   "source": "def f():\n  pass\n\na = f()\nb = f()",
   "line": 1,
   "col": 4,
-  "path": "/home/user/code/src/file.py"
+  "path": "/home/user/code/src/file.py",
+  "settings": {
+    "additional_dynamic_modules": "/path/to/a/file.py"
+  } // Jedi settings. Optional.
 }
 ```
 
@@ -225,9 +236,10 @@ Parameters:
 {
   "source": "import os\n\nCONSTANT = 1\n\ndef test():\n  pass",
   "path": "/home/user/code/src/file.py"
-  "all_scopes": false, // Optional (default is false)
-  "definitions": true, // Optional (default is true)
-  "references": false // Optional (default is false)
+  "all_scopes": false, // Optional (default is false).
+  "definitions": true, // Optional (default is true).
+  "references": false, // Optional (default is false).
+  "settings": {} // Jedi settings. Optional.
 }
 ```
 

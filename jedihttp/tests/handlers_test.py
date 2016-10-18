@@ -20,7 +20,7 @@ from jedihttp import handlers
 from nose.tools import ok_
 from hamcrest import ( assert_that, only_contains, contains,
                        contains_inanyorder, all_of, is_not, has_key, has_item,
-                       has_items, has_entry, equal_to, is_, empty )
+                       has_items, has_entry, has_entries, equal_to, is_, empty )
 
 import bottle
 bottle.debug( True )
@@ -112,10 +112,10 @@ def test_bad_gotodefinitions_blank_line():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-    'source': open( filepath ).read(),
-    'line': 9,
-    'col': 1,
-    'source_path': filepath
+      'source': open( filepath ).read(),
+      'line': 9,
+      'col': 1,
+      'source_path': filepath
   }
   definitions = app.post_json( '/gotodefinition',
                                request_data ).json[ 'definitions' ]
@@ -126,10 +126,10 @@ def test_bad_gotodefinitions_not_on_valid_position():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-    'source': open( filepath ).read(),
-    'line': 100,
-    'col': 1,
-    'source_path': filepath
+      'source': open( filepath ).read(),
+      'line': 100,
+      'col': 1,
+      'source_path': filepath
   }
   response = app.post_json( '/gotodefinition',
                             request_data,
@@ -354,6 +354,64 @@ def test_preload_module():
   }
 
   ok_( app.post_json( '/preload_module', request_data ) )
+
+
+def test_usages_settings_additional_dynamic_modules():
+  app = TestApp( handlers.app )
+  file1 = fixture_filepath( 'module', 'some_module', 'file1.py' )
+  file2 = fixture_filepath( 'module', 'some_module', 'file2.py' )
+  main_file = fixture_filepath( 'module', 'main.py' )
+  request_data = {
+      'source': open( file2 ).read(),
+      'line': 5,
+      'col': 17,
+      'source_path': file2,
+      'settings': {
+          'additional_dynamic_modules': [ main_file ]
+      }
+  }
+
+  definitions = app.post_json( '/usages',
+                               request_data ).json[ 'definitions' ]
+
+  assert_that( definitions, contains_inanyorder(
+      has_entries( {
+          'module_path': file2,
+          'name': 'FILE1_CONSTANT',
+          'line': 5,
+          'column': 11
+      } ),
+      has_entries( {
+          'module_path': file2,
+          'name': 'FILE1_CONSTANT',
+          'line': 1,
+          'column': 18
+      } ),
+      has_entries( {
+          'module_path': file1,
+          'name': 'FILE1_CONSTANT',
+          'line': 5,
+          'column': 11
+      } ),
+      has_entries( {
+          'module_path': file1,
+          'name': 'FILE1_CONSTANT',
+          'line': 1,
+          'column': 0
+      } ),
+      has_entries( {
+          'module_path': main_file,
+          'name': 'FILE1_CONSTANT',
+          'line': 1,
+          'column': 30
+      } ),
+      has_entries( {
+          'module_path': main_file,
+          'name': 'FILE1_CONSTANT',
+          'line': 5,
+          'column': 11
+      } )
+  ) )
 
 
 @py3only
