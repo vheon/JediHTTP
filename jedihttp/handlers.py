@@ -100,6 +100,14 @@ def names():
   return _JsonResponse( response )
 
 
+@app.post( '/preload_module' )
+def preload_module():
+  logger.debug( 'received /preload_module request' )
+  with jedi_lock:
+    jedi.preload_module( *request.json[ 'modules' ] )
+  return _JsonResponse( True )
+
+
 def _FormatCompletions( completions ):
   return {
       'completions': [ {

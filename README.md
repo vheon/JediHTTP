@@ -276,6 +276,22 @@ Response:
 }
 ```
 
+### POST /preload_module
+
+Parameters:
+
+```javascript
+{
+  "modules": [ "numpy", ... ]
+}
+```
+
+Response:
+
+```javascript
+true
+```
+
 ### In case of errors
 
 Response:

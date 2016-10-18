@@ -347,6 +347,15 @@ def test_names():
   ) )
 
 
+def test_preload_module():
+  app = TestApp( handlers.app )
+  request_data = {
+      'modules': [ 'os', 'sys' ]
+  }
+
+  ok_( app.post_json( '/preload_module', request_data ) )
+
+
 @py3only
 def test_py3():
   app = TestApp( handlers.app )
