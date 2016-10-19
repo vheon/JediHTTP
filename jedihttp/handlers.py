@@ -57,17 +57,7 @@ def completions():
   logger.debug( 'received /completions request' )
   with jedi_lock:
     script = _GetJediScript( request.json )
-    response = {
-      'completions': [ {
-        'module_path': completion.module_path,
-        'name':        completion.name,
-        'line':        completion.line,
-        'column':      completion.column,
-        'docstring':   completion.docstring(),
-        'description': completion.description,
-        'type':        completion.type
-      } for completion in script.completions() ]
-    }
+    response = _FormatCompletions( script.completions() )
   return _JsonResponse( response )
 
 
@@ -101,17 +91,42 @@ def usages():
   return _JsonResponse( response )
 
 
+@app.post( '/names' )
+def names():
+  logger.debug( 'received /names request' )
+  with jedi_lock:
+    definitions = _GetJediNames( request.json )
+    response = _FormatDefinitions( definitions )
+  return _JsonResponse( response )
+
+
+def _FormatCompletions( completions ):
+  return {
+      'completions': [ {
+          'module_path': completion.module_path,
+          'name':        completion.name,
+          'type':        completion.type,
+          'line':        completion.line,
+          'column':      completion.column,
+          'docstring':   completion.docstring(),
+          'description': completion.description,
+      } for completion in completions ]
+  }
+
+
 def _FormatDefinitions( definitions ):
   return {
       'definitions': [ {
-        'module_path':       definition.module_path,
-        'name':              definition.name,
-        'in_builtin_module': definition.in_builtin_module(),
-        'line':              definition.line,
-        'column':            definition.column,
-        'docstring':         definition.docstring(),
-        'description':       definition.description,
-        'is_keyword':        definition.is_keyword
+          'module_path':       definition.module_path,
+          'name':              definition.name,
+          'type':              definition.type,
+          'in_builtin_module': definition.in_builtin_module(),
+          'line':              definition.line,
+          'column':            definition.column,
+          'docstring':         definition.docstring(),
+          'description':       definition.description,
+          'full_name':         definition.full_name,
+          'is_keyword':        definition.is_keyword
       } for definition in definitions ]
   }
 
@@ -121,6 +136,14 @@ def _GetJediScript( request_data ):
                       request_data[ 'line' ],
                       request_data[ 'col' ],
                       request_data[ 'source_path' ] )
+
+
+def _GetJediNames( request_data ):
+  return jedi.names( source = request_data[ 'source' ],
+                     path = request_data[ 'path' ],
+                     all_scopes = request_data.get( 'all_scopes', False ),
+                     definitions = request_data.get( 'definitions', True ),
+                     references = request_data.get( 'references', False ) )
 
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )

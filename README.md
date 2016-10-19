@@ -77,12 +77,13 @@ Response:
 {
   "completions": [
     {
+      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module.
       "name": "name", // Name of variable/function/class/module.
-      "description": "A textual description of the object.",
-      "docstring": "A document string for this completion object.",
-      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module
+      "type": "type", // Type of the completion (module, class, instance, etc.)
       "line": 4,  // The line where the definition occurs (starting with 1).
-      "column": 2 // The column where the definition occurs (starting with 0).
+      "column": 2, // The column where the definition occurs (starting with 0).
+      "docstring": "A document string for this completion object.",
+      "description": "A textual description of the object."
     },
     ...
   ]
@@ -108,14 +109,17 @@ Response:
 {
   "definitions": [
     {
-      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module
+      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module.
+      "name": "name", // Name of variable/function/class/module.
       "line": 3,  // The line where the definition occurs (starting with 1).
-      "column": 1 // The column where the definition occurs (starting with 0).
+      "column": 1, // The column where the definition occurs (starting with 0).
       "in_builtin_module": false, // Whether this is a builtin module.
       "is_keyword": false,
-      "description": "A description of the Definition object",
       "docstring": "A document string for this Definition object.",
-    }
+      "description": "A description of the Definition object.",
+      "full_name": "Dot-separated path of this object."
+    },
+    ...
   ]
 }
 ```
@@ -140,14 +144,17 @@ Response:
 {
   "definitions": [
     {
-      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module
+      "module_path": "/usr/lib/python2.7/os.py", // Shows the file path of a module.
+      "name": "name", // Name of variable/function/class/module.
       "line": 3,  // The line where the definition occurs (starting with 1).
       "column": 1 // The column where the definition occurs (starting with 0).
       "in_builtin_module": false, // Whether this is a builtin module.
       "is_keyword": false,
-      "description": "A description of the Definition object",
       "docstring": "A document string for this Definition object.",
-    }
+      "description": "A description of the Definition object.",
+      "full_name": "Dot-separated path of this object."
+    },
+    ...
   ]
 }
 ```
@@ -171,31 +178,99 @@ Response:
 {
   "definitions": [
     {
-      'description': 'def f',
-      'in_builtin_module': False,
-      'is_keyword': False,
-      'module_path': '/home/user/code/src/file.py',
-      'column': 4,
-      'line': 1,
-      'docstring': ''
+      "module_path": "/home/user/code/src/file.py",
+      "name": "f",
+      "type": "function",
+      "in_builtin_module": false,
+      "line": 1,
+      "column": 4,
+      "docstring": "",
+      "description": "def f",
+      "full_name": "file.f",
+      "is_keyword": false
     },
     {
-      'description': 'a = f()',
-      'in_builtin_module': False,
-      'is_keyword': False,
-      'module_path': /home/user/code/src/file.py,
-      'column': 4,
-      'line': 4,
-      'docstring': ''
+      "module_path": "/home/user/code/src/file.py",
+      "name": "f",
+      "type": "statement",
+      "in_builtin_module": false,
+      "line": 4,
+      "column": 4,
+      "docstring": "",
+      "description": "a = f()",
+      "full_name": "file",
+      "is_keyword": false
     },
     {
-      'description': 'b = f()',
-      'in_builtin_module': False,
-      'is_keyword': False,
-      'module_path': '/home/user/code/src/file.py',
-      'column': 4,
-      'line': 5,
-      'docstring': ''
+      "module_path": "/home/user/code/src/file.py",
+      "name": "f",
+      "type": "statement",
+      "in_builtin_module": false,
+      "line": 5,
+      "column": 4,
+      "docstring": "",
+      "description": "b = f()",
+      "full_name": "file",
+      "is_keyword": false
+    }
+  ]
+}
+```
+
+### POST /names
+
+Parameters:
+
+```javascript
+{
+  "source": "import os\n\nCONSTANT = 1\n\ndef test():\n  pass",
+  "path": "/home/user/code/src/file.py"
+  "all_scopes": false, // Optional (default is false)
+  "definitions": true, // Optional (default is true)
+  "references": false // Optional (default is false)
+}
+```
+
+Response:
+
+```javascript
+{
+  "definitions": [
+    {
+      "module_path": "/home/usr/code/src/file.py",
+      "name": "os",
+      "type": "import",
+      "in_builtin_module": false,
+      "line": 1,
+      "column": 7,
+      "docstring": "",
+      "description": "import os",
+      "full_name": "os",
+      "is_keyword": false
+    },
+    {
+      "module_path": "/home/usr/code/src/file.py",
+      "name": "CONSTANT",
+      "type": "statement",
+      "in_builtin_module": false,
+      "line": 3,
+      "column": 0,
+      "docstring": "",
+      "description": "CONSTANT = 1",
+      "full_name": "names",
+      "is_keyword": false
+    },
+    {
+      "module_path": "/home/usr/code/src/file.py",
+      "name": "test",
+      "type": "function",
+      "in_builtin_module": false,
+      "line": 5,
+      "column": 4,
+      "docstring": "test()\n\n",
+      "description": "def test",
+      "full_name": "names.test",
+      "is_keyword": false
     }
   ]
 }
