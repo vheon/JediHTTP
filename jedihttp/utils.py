@@ -21,3 +21,17 @@ def AddVendorFolderToSysPath():
   for folder in os.listdir( vendor_folder ):
     sys.path.insert( 0, os.path.realpath( os.path.join( vendor_folder,
                                                         folder ) ) )
+
+
+def JsonResponse( data ):
+  response.content_type = 'application/json'
+  return json.dumps( data, default = _Serializer )
+
+
+def _Serializer( obj ):
+  try:
+    serialized = obj.__dict__.copy()
+    serialized[ 'TYPE' ] = type( obj ).__name__
+    return serialized
+  except AttributeError:
+    return str( obj )

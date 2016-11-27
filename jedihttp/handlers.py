@@ -23,6 +23,7 @@ import bottle
 from bottle import response, request, Bottle
 from jedihttp import hmaclib
 from jedihttp.compatibility import iteritems
+from jedihttp.utils import JsonResponse
 from threading import Lock
 
 try:
@@ -65,13 +66,13 @@ default_settings = {
 @app.post( '/healthy' )
 def healthy():
   logger.debug( 'received /healthy request' )
-  return _JsonResponse( True )
+  return True
 
 
 @app.post( '/ready' )
 def ready():
   logger.debug( 'received /ready request' )
-  return _JsonResponse( True )
+  return True
 
 
 @app.post( '/completions' )
@@ -82,7 +83,7 @@ def completions():
     with _CustomSettings( request_json ):
       script = _GetJediScript( request_json )
       response = _FormatCompletions( script.completions() )
-  return _JsonResponse( response )
+  return response
 
 
 @app.post( '/gotodefinition' )
@@ -93,7 +94,7 @@ def gotodefinition():
     with _CustomSettings( request_json ):
       script = _GetJediScript( request_json )
       response = _FormatDefinitions( script.goto_definitions() )
-  return _JsonResponse( response )
+  return response
 
 
 @app.post( '/gotoassignment' )
@@ -105,7 +106,7 @@ def gotoassignments():
     with _CustomSettings( request_json ):
       script = _GetJediScript( request_json )
       response = _FormatDefinitions( script.goto_assignments( follow_imports ) )
-  return _JsonResponse( response )
+  return response
 
 
 @app.post( '/usages' )
@@ -116,7 +117,7 @@ def usages():
     with _CustomSettings( request_json ):
       script = _GetJediScript( request_json )
       response = _FormatDefinitions( script.usages() )
-  return _JsonResponse( response )
+  return response
 
 
 @app.post( '/names' )
@@ -127,7 +128,7 @@ def names():
     with _CustomSettings( request_json ):
       definitions = _GetJediNames( request_json )
       response = _FormatDefinitions( definitions )
-  return _JsonResponse( response )
+  return response
 
 
 @app.post( '/preload_module' )
@@ -137,7 +138,7 @@ def preload_module():
     request_json = request.json
     with _CustomSettings( request_json ):
       jedi.preload_module( *request_json[ 'modules' ] )
-  return _JsonResponse( True )
+  return True
 
 
 def _FormatCompletions( completions ):
@@ -206,7 +207,7 @@ def _CustomSettings( request_data ):
 
 @app.error( httplib.INTERNAL_SERVER_ERROR )
 def ErrorHandler( httperror ):
-  body = _JsonResponse( {
+  body = JsonResponse( {
     'exception': httperror.exception,
     'message': str( httperror.exception ),
     'traceback': httperror.traceback
@@ -216,17 +217,3 @@ def ErrorHandler( httperror ):
     hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
     hmachelper.SignResponseHeaders( response.headers, body )
   return body
-
-
-def _JsonResponse( data ):
-  response.content_type = 'application/json'
-  return json.dumps( data, default = _Serializer )
-
-
-def _Serializer( obj ):
-  try:
-    serialized = obj.__dict__.copy()
-    serialized[ 'TYPE' ] = type( obj ).__name__
-    return serialized
-  except AttributeError:
-    return str( obj )
