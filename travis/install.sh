@@ -19,32 +19,42 @@ set -e
 
 if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
   # install pyenv
-  git clone --branch=v20151103 --depth=1 https://github.com/yyuu/pyenv.git ~/.pyenv
+  if [[ ! -d "$HOME/.pyenv/.git" ]]; then
+    rm -rf ~/.pyenv
+    git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+  else
+    ( cd ~/.pyenv; git pull; )
+  fi
   PYENV_ROOT="$HOME/.pyenv"
   PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
-  pyenv install 3.3.6
-  echo "3.3.6" >> .python-version
 
   case "${TOXENV}" in
-    py26)
-      curl -O https://bootstrap.pypa.io/get-pip.py
-      python get-pip.py --user
+    py26*)
+      PYTHON_VERSION=2.6.9
       ;;
-    py27)
-      curl -O https://bootstrap.pypa.io/get-pip.py
-      python get-pip.py --user
+    py27*)
+      PYTHON_VERSION=2.7.13
       ;;
-    py33)
-      pyenv global 3.3.6
+    py33*)
+      PYTHON_VERSION=3.3.6
+      ;;
+    py34*)
+      PYTHON_VERSION=3.4.5
+      ;;
+    py35*)
+      PYTHON_VERSION=3.5.2
+      ;;
+    py36*)
+      PYTHON_VERSION=3.6.0
       ;;
   esac
+  pyenv install -s "$PYTHON_VERSION"
+  pyenv global "$PYTHON_VERSION"
   pyenv rehash
-  python -m pip install --user virtualenv
-else
-  pip install virtualenv
 fi
 
-python -m virtualenv ~/.venv
+pip install virtualenv
+virtualenv ~/.venv
 source ~/.venv/bin/activate
 pip install tox
