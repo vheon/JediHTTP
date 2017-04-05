@@ -159,7 +159,7 @@ def test_good_gotoassignment():
       'column': 0,
       'docstring': '',
       'description': 'inception = _list[ 2 ]',
-      'full_name': 'goto',
+      'full_name': 'goto.inception',
       'is_keyword': False
   } ) )
 
@@ -176,12 +176,12 @@ def test_good_gotoassignment_do_not_follow_imports():
   expected_definition = {
       'module_path': filepath,
       'name': 'imported_function',
-      'type': 'import',
+      'type': 'function',
       'in_builtin_module': False,
       'line': 1,
       'column': 21,
       'docstring': '',
-      'description': 'from imported import imported_function',
+      'description': 'def imported_function',
       'full_name': 'imported.imported_function',
       'is_keyword': False
   }
@@ -264,7 +264,7 @@ def test_usages():
           'column': 4,
           'description': 'a = f()',
           'docstring': '',
-          'full_name': 'usages',
+          'full_name': 'usages.f',
           'is_keyword': False
       },
       {
@@ -276,7 +276,7 @@ def test_usages():
           'column': 4,
           'description': 'b = f()',
           'docstring': '',
-          'full_name': 'usages',
+          'full_name': 'usages.f',
           'is_keyword': False
       },
       {
@@ -288,7 +288,7 @@ def test_usages():
           'column': 4,
           'description': 'c = f()',
           'docstring': '',
-          'full_name': 'usages',
+          'full_name': 'usages.f',
           'is_keyword': False
       }
   ) )
@@ -311,12 +311,12 @@ def test_names():
       {
         'module_path': filepath,
         'name': 'os',
-        'type': 'import',
+        'type': 'module',
         'in_builtin_module': False,
         'line': 1,
         'column': 7,
         'docstring': '',
-        'description': 'import os',
+        'description': 'module os',
         'full_name': 'os',
         'is_keyword': False
       },
@@ -329,7 +329,7 @@ def test_names():
         'column': 0,
         'docstring': '',
         'description': 'CONSTANT = 1',
-        'full_name': 'names',
+        'full_name': 'names.CONSTANT',
         'is_keyword': False
       },
       {
