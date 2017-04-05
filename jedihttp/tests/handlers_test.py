@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import
 
-from .utils import fixture_filepath, py3only
+from .utils import fixture_filepath, py3only, read_file
 from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
@@ -52,7 +52,7 @@ def test_completion():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'basic.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 7,
       'col': 2,
       'source_path': filepath
@@ -70,7 +70,7 @@ def test_good_gotodefinition():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 10,
       'col': 3,
       'source_path': filepath
@@ -112,7 +112,7 @@ def test_bad_gotodefinitions_blank_line():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 9,
       'col': 1,
       'source_path': filepath
@@ -126,7 +126,7 @@ def test_bad_gotodefinitions_not_on_valid_position():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 100,
       'col': 1,
       'source_path': filepath
@@ -141,7 +141,7 @@ def test_good_gotoassignment():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 20,
       'col': 1,
       'source_path': filepath
@@ -168,7 +168,7 @@ def test_good_gotoassignment_do_not_follow_imports():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'follow_imports', 'importer.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 3,
       'col': 9,
       'source_path': filepath
@@ -204,7 +204,7 @@ def test_good_gotoassignment_follow_imports():
   importer_filepath = fixture_filepath( 'follow_imports', 'importer.py' )
   imported_filepath = fixture_filepath( 'follow_imports', 'imported.py' )
   request_data = {
-      'source': open( importer_filepath ).read(),
+      'source': read_file( importer_filepath ),
       'line': 3,
       'col': 9,
       'source_path': importer_filepath,
@@ -232,7 +232,7 @@ def test_usages():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'usages.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 8,
       'col': 5,
       'source_path': filepath
@@ -298,7 +298,7 @@ def test_names():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'names.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'path': filepath,
       'all_scopes': False,
       'definitions': True,
@@ -362,7 +362,7 @@ def test_usages_settings_additional_dynamic_modules():
   file2 = fixture_filepath( 'module', 'some_module', 'file2.py' )
   main_file = fixture_filepath( 'module', 'main.py' )
   request_data = {
-      'source': open( file2 ).read(),
+      'source': read_file( file2 ),
       'line': 5,
       'col': 17,
       'source_path': file2,
@@ -419,7 +419,7 @@ def test_py3():
   app = TestApp( handlers.app )
   filepath = fixture_filepath( 'py3.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 19,
       'col': 11,
       'source_path': filepath

@@ -74,6 +74,13 @@ def fixture_filepath( *components ):
   return os.path.join( dir_of_current_script, 'fixtures', *components )
 
 
+# Python 3 complains on the common open(path).read() idiom because the file
+# doesn't get closed.
+def read_file( filepath ):
+  with open( filepath ) as f:
+    return f.read()
+
+
 # Creation flag to disable creating a console window on Windows. See
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863.aspx
 CREATE_NO_WINDOW = 0x08000000

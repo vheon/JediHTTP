@@ -13,7 +13,7 @@
 
 
 from . import utils
-from .utils import with_jedihttp, py2only
+from .utils import with_jedihttp, py2only, read_file
 import requests
 import subprocess
 from jedihttp import hmaclib
@@ -88,7 +88,7 @@ def test_client_request_with_parameters( jedihttp ):
 
   filepath = utils.fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 10,
       'col': 3,
       'source_path': filepath
@@ -112,7 +112,7 @@ def test_client_bad_request_with_parameters( jedihttp ):
 
   filepath = utils.fixture_filepath( 'goto.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 100,
       'col': 1,
       'source_path': filepath
@@ -137,7 +137,7 @@ def test_client_python3_specific_syntax_completion( jedihttp ):
 
   filepath = utils.fixture_filepath( 'py3.py' )
   request_data = {
-      'source': open( filepath ).read(),
+      'source': read_file( filepath ),
       'line': 19,
       'col': 11,
       'source_path': filepath
