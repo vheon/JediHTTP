@@ -23,6 +23,7 @@ import bottle
 from bottle import response, request, Bottle
 from jedihttp import hmaclib
 from jedihttp.compatibility import iteritems
+from jedihttp.settings import default_settings
 from threading import Lock
 
 try:
@@ -40,26 +41,6 @@ app = Bottle( __name__ )
 
 # Jedi is not thread safe.
 jedi_lock = Lock()
-
-# For efficiency, we store the default values of the global Jedi settings. See
-# https://jedi.readthedocs.io/en/latest/docs/settings.html
-default_settings = {
-    'case_insensitive_completion'     :
-        jedi.settings.case_insensitive_completion,
-    'add_bracket_after_function'      :
-        jedi.settings.add_bracket_after_function,
-    'no_completion_duplicates'        : jedi.settings.no_completion_duplicates,
-    'cache_directory'                 : jedi.settings.cache_directory,
-    'use_filesystem_cache'            : jedi.settings.cache_directory,
-    'fast_parser'                     : jedi.settings.fast_parser,
-    'dynamic_array_additions'         : jedi.settings.dynamic_array_additions,
-    'dynamic_params'                  : jedi.settings.dynamic_params,
-    'dynamic_params_for_other_modules':
-        jedi.settings.dynamic_params_for_other_modules,
-    'additional_dynamic_modules'      :
-        jedi.settings.additional_dynamic_modules,
-    'auto_import_modules'             : jedi.settings.auto_import_modules
-}
 
 
 @app.post( '/healthy' )
