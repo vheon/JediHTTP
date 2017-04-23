@@ -431,3 +431,20 @@ def test_py3():
   assert_that( completions, has_item( CompletionEntry( 'values' ) ) )
   assert_that( completions,
                is_not( has_item( CompletionEntry( 'itervalues' ) ) ) )
+
+
+def test_completion_socket_module():
+  app = TestApp( handlers.app )
+  filepath = fixture_filepath( 'socket_module.py' )
+  request_data = {
+      'source': read_file( filepath ),
+      'line': 4,
+      'col': 4,
+      'source_path': filepath
+  }
+
+  completions = app.post_json( '/completions',
+                                request_data ).json[ 'completions' ]
+
+  assert_that( completions, has_items( CompletionEntry( 'connect' ),
+                                       CompletionEntry( 'connect_ex' ) ) )
