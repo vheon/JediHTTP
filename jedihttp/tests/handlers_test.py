@@ -18,7 +18,7 @@ from .utils import fixture_filepath, py3only, read_file
 from webtest import TestApp
 from jedihttp import handlers
 from nose.tools import ok_
-from hamcrest import ( assert_that, only_contains, contains,
+from hamcrest import ( assert_that, only_contains, contains, contains_string,
                        contains_inanyorder, all_of, is_not, has_key, has_item,
                        has_items, has_entry, has_entries, equal_to, is_, empty )
 
@@ -180,7 +180,7 @@ def test_good_gotoassignment_do_not_follow_imports():
       'in_builtin_module': False,
       'line': 1,
       'column': 21,
-      'docstring': '',
+      'docstring': 'imported_function()\n\n',
       'description': 'def imported_function',
       'full_name': 'imported.imported_function',
       'is_keyword': False
@@ -308,19 +308,19 @@ def test_names():
   definitions = app.post_json( '/names', request_data ).json[ 'definitions' ]
 
   assert_that( definitions, contains_inanyorder(
-      {
+      has_entries( {
         'module_path': filepath,
         'name': 'os',
         'type': 'module',
         'in_builtin_module': False,
         'line': 1,
         'column': 7,
-        'docstring': '',
+        'docstring': contains_string( 'OS routines' ),
         'description': 'module os',
         'full_name': 'os',
         'is_keyword': False
-      },
-      {
+      } ),
+      has_entries( {
         'module_path': filepath,
         'name': 'CONSTANT',
         'type': 'statement',
@@ -331,8 +331,8 @@ def test_names():
         'description': 'CONSTANT = 1',
         'full_name': 'names.CONSTANT',
         'is_keyword': False
-      },
-      {
+      } ),
+      has_entries( {
         'module_path': filepath,
         'name': 'test',
         'type': 'function',
@@ -343,7 +343,7 @@ def test_names():
         'description': 'def test',
         'full_name': 'names.test',
         'is_keyword': False
-      },
+      } )
   ) )
 
 
