@@ -17,61 +17,56 @@ from bottle import request, response, abort
 from jedihttp import hmaclib
 
 try:
-  from urlparse import urlparse
-  import httplib
+    from urlparse import urlparse
+    import httplib
 except ImportError:
-  from urllib.parse import urlparse
-  from http import client as httplib
+    from urllib.parse import urlparse
+    from http import client as httplib
 
 
-class HmacPlugin( object ):
-  """
-  Bottle plugin for hmac request authentication
-  http://bottlepy.org/docs/dev/plugindev.html
-  """
-  name = 'hmac'
-  api = 2
+class HmacPlugin(object):
+    """
+    Bottle plugin for hmac request authentication
+    http://bottlepy.org/docs/dev/plugindev.html
+    """
+    name = 'hmac'
+    api = 2
+
+    def __init__(self):
+        self._logger = logging.getLogger(__name__)
+
+    def setup(self, app):
+        hmac_secret = app.config['jedihttp.hmac_secret']
+        self._hmachelper = hmaclib.JediHTTPHmacHelper(hmac_secret)
+
+    def __call__(self, callback):
+        def wrapper(*args, **kwargs):
+            if not is_local_request():
+                self._logger.info('Dropping request with bad Host header.')
+                abort(httplib.UNAUTHORIZED,
+                      'Unauthorized, received request from non-local Host.')
+                return
+
+            if not self.is_request_authenticated():
+                self._logger.info('Dropping request with bad HMAC.')
+                abort(httplib.UNAUTHORIZED, 'Unauthorized, received bad HMAC.')
+                return
+
+            body = callback(*args, **kwargs)
+            self.sign_response_headers(response.headers, body)
+            return body
+        return wrapper
+
+    def is_request_authenticated(self):
+        return self._hmachelper.is_request_authenticated(request.headers,
+                                                         request.method,
+                                                         request.path,
+                                                         request.body.read())
+
+    def sign_response_headers(self, headers, body):
+        self._hmachelper.sign_response_headers(headers, body)
 
 
-  def __init__( self ):
-    self._logger = logging.getLogger( __name__ )
-
-
-  def setup( self, app ):
-    hmac_secret = app.config[ 'jedihttp.hmac_secret' ]
-    self._hmachelper = hmaclib.JediHTTPHmacHelper( hmac_secret )
-
-
-  def __call__( self, callback ):
-    def wrapper( *args, **kwargs ):
-      if not IsLocalRequest():
-        self._logger.info( 'Dropping request with bad Host header.' )
-        abort( httplib.UNAUTHORIZED,
-               'Unauthorized, received request from non-local Host.' )
-        return
-
-      if not self.IsRequestAuthenticated():
-        self._logger.info( 'Dropping request with bad HMAC.' )
-        abort( httplib.UNAUTHORIZED, 'Unauthorized, received bad HMAC.' )
-        return
-
-      body = callback( *args, **kwargs )
-      self.SignResponseHeaders( response.headers, body )
-      return body
-    return wrapper
-
-
-  def IsRequestAuthenticated( self ):
-    return self._hmachelper.IsRequestAuthenticated( request.headers,
-                                                    request.method,
-                                                    request.path,
-                                                    request.body.read() )
-
-
-  def SignResponseHeaders( self, headers, body ):
-    self._hmachelper.SignResponseHeaders( headers, body )
-
-
-def IsLocalRequest():
-  host = urlparse( 'http://' + request.headers[ 'host' ] ).hostname
-  return host == '127.0.0.1' or host == 'localhost'
+def is_local_request():
+    host = urlparse('http://' + request.headers['host']).hostname
+    return host == '127.0.0.1' or host == 'localhost'

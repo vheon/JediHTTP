@@ -20,23 +20,30 @@ import sys
 auto_import_modules = jedi.settings.auto_import_modules
 # The socket module uses setattr for several methods (connect, listen, etc.) on
 # Python 2.
-if sys.version_info < ( 3, 0 ):
-  auto_import_modules.append( 'socket' )
+if sys.version_info < (3, 0):
+    auto_import_modules.append('socket')
 
 default_settings = {
-    'case_insensitive_completion'     :
+    'case_insensitive_completion':
         jedi.settings.case_insensitive_completion,
-    'add_bracket_after_function'      :
+    'add_bracket_after_function':
         jedi.settings.add_bracket_after_function,
-    'no_completion_duplicates'        : jedi.settings.no_completion_duplicates,
-    'cache_directory'                 : jedi.settings.cache_directory,
-    'use_filesystem_cache'            : jedi.settings.use_filesystem_cache,
-    'fast_parser'                     : jedi.settings.fast_parser,
-    'dynamic_array_additions'         : jedi.settings.dynamic_array_additions,
-    'dynamic_params'                  : jedi.settings.dynamic_params,
+    'no_completion_duplicates':
+        jedi.settings.no_completion_duplicates,
+    'cache_directory':
+        jedi.settings.cache_directory,
+    'use_filesystem_cache':
+        jedi.settings.use_filesystem_cache,
+    'fast_parser':
+        jedi.settings.fast_parser,
+    'dynamic_array_additions':
+        jedi.settings.dynamic_array_additions,
+    'dynamic_params':
+        jedi.settings.dynamic_params,
     'dynamic_params_for_other_modules':
         jedi.settings.dynamic_params_for_other_modules,
-    'additional_dynamic_modules'      :
+    'additional_dynamic_modules':
         jedi.settings.additional_dynamic_modules,
-    'auto_import_modules'             : auto_import_modules
+    'auto_import_modules':
+        auto_import_modules
 }

@@ -20,77 +20,71 @@ from base64 import b64encode, b64decode
 from jedihttp.compatibility import encode_string, decode_string, compare_digest
 
 
-def TemporaryHmacSecretFile( secret ):
-  """Helper function for passing the hmac secret when starting a JediHTTP server
+def temporary_hmac_secret_file(secret):
+    """Helper function for passing the hmac secret when starting a JediHTTP
+    server:
 
-    with TemporaryHmacSecretFile( 'mysecret' ) as hmac_file:
-      jedihttp = subprocess.Popen( ['python',
-                                    'jedihttp',
-                                    '--hmac-file-secret', hmac_file.name ] )
+      with temporary_hmac_secret_file('mysecret') as hmac_file:
+          jedihttp = subprocess.Popen(['python',
+                                       'jedihttp',
+                                       '--hmac-file-secret', hmac_file.name])
 
-    The JediHTTP Server as soon as it reads the hmac secret will remove the file
-  """
-  hmac_file = tempfile.NamedTemporaryFile( 'w', delete = False )
-  encoded_secret = decode_string( b64encode( encode_string( secret ) ) )
-  json.dump( { 'hmac_secret': encoded_secret }, hmac_file )
-  return hmac_file
+    The JediHTTP Server as soon as it reads the hmac secret will remove the
+    file.
+    """
+    hmac_file = tempfile.NamedTemporaryFile('w', delete=False)
+    encoded_secret = decode_string(b64encode(encode_string(secret)))
+    json.dump({'hmac_secret': encoded_secret}, hmac_file)
+    return hmac_file
 
 
 _HMAC_HEADER = 'x-jedihttp-hmac'
 
 
-class JediHTTPHmacHelper( object ):
-  """Helper class to correctly signing requests and validating responses when
-  communicating with a JediHTTP server."""
-  def __init__( self, secret ):
-    self._secret = encode_string( secret )
+class JediHTTPHmacHelper(object):
+    """Helper class to correctly signing requests and validating responses when
+    communicating with a JediHTTP server."""
+    def __init__(self, secret):
+        self._secret = encode_string(secret)
 
+    def _has_header(self, headers):
+        return _HMAC_HEADER in headers
 
-  def _HasHeader( self, headers ):
-    return _HMAC_HEADER in headers
+    def _set_hmac_header(self, headers, hmac):
+        headers[_HMAC_HEADER] = decode_string(b64encode(hmac))
 
+    def _get_hmac_header(self, headers):
+        return b64decode(headers[_HMAC_HEADER])
 
-  def _SetHmacHeader( self, headers, hmac ):
-    headers[ _HMAC_HEADER ] = decode_string( b64encode( hmac ) )
+    def _hmac(self, content):
+        return hmac.new(self._secret,
+                        msg=encode_string(content),
+                        digestmod=hashlib.sha256).digest()
 
+    def _compute_request_hmac(self, method, path, body):
+        if not body:
+            body = ''
+        return self._hmac(b''.join((self._hmac(method),
+                                    self._hmac(path),
+                                    self._hmac(body))))
 
-  def _GetHmacHeader( self, headers ):
-    return b64decode( headers[ _HMAC_HEADER ] )
+    def sign_request_headers(self, headers, method, path, body):
+        self._set_hmac_header(headers,
+                              self._compute_request_hmac(method, path, body))
 
+    def is_request_authenticated(self, headers, method, path, body):
+        if not self._has_header(headers):
+            return False
 
-  def _Hmac( self, content ):
-    return hmac.new( self._secret,
-                     msg = encode_string( content ),
-                     digestmod = hashlib.sha256 ).digest()
+        return compare_digest(self._get_hmac_header(headers),
+                              self._compute_request_hmac(method, path, body))
 
+    def sign_response_headers(self, headers, body):
+        self._set_hmac_header(headers, self._hmac(body))
 
-  def _ComputeRequestHmac( self, method, path, body ):
-    if not body:
-      body = ''
-    return self._Hmac( b''.join( ( self._Hmac( method ),
-                                   self._Hmac( path ),
-                                   self._Hmac( body ) ) ) )
+    def is_response_authenticated(self, headers, content):
+        if not self._has_header(headers):
+            return False
 
-
-  def SignRequestHeaders( self, headers, method, path, body ):
-    self._SetHmacHeader( headers, self._ComputeRequestHmac( method, path, body ) )
-
-
-  def IsRequestAuthenticated( self, headers, method, path, body ):
-    if not self._HasHeader( headers ):
-      return False
-
-    return compare_digest( self._GetHmacHeader( headers ),
-                           self._ComputeRequestHmac( method, path, body ) )
-
-
-  def SignResponseHeaders( self, headers, body ):
-    self._SetHmacHeader( headers, self._Hmac( body ) )
-
-
-  def IsResponseAuthenticated( self, headers, content ):
-    if not self._HasHeader( headers ):
-      return False
-
-    return compare_digest( self._GetHmacHeader( headers ),
-                           self._Hmac( content ) )
+        return compare_digest(self._get_hmac_header(headers),
+                              self._hmac(content))
