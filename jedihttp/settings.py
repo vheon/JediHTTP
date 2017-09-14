@@ -30,7 +30,7 @@ default_settings = {
         jedi.settings.add_bracket_after_function,
     'no_completion_duplicates'        : jedi.settings.no_completion_duplicates,
     'cache_directory'                 : jedi.settings.cache_directory,
-    'use_filesystem_cache'            : jedi.settings.cache_directory,
+    'use_filesystem_cache'            : jedi.settings.use_filesystem_cache,
     'fast_parser'                     : jedi.settings.fast_parser,
     'dynamic_array_additions'         : jedi.settings.dynamic_array_additions,
     'dynamic_params'                  : jedi.settings.dynamic_params,
