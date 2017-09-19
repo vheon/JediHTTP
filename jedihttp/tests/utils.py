@@ -22,63 +22,67 @@ import subprocess
 
 # python3 compatibility
 try:
-  basestring
+    basestring
 except NameError:
-  basestring = str
+    basestring = str
 
 try:
-  import unittest2 as unittest
+    import unittest2 as unittest
 except ImportError:
-  import unittest
+    import unittest
 
-py3only = unittest.skipIf( sys.version_info < ( 3, 0 ), "Python 3.x only test" )
-py2only = unittest.skipIf( sys.version_info >= ( 3, 0 ), "Python 2.x only test" )
+py3only = unittest.skipIf(sys.version_info < (3, 0), "Python 3.x only test")
+py2only = unittest.skipIf(sys.version_info >= (3, 0), "Python 2.x only test")
 
 
 def python3():
-  if OnWindows():
-    return os.path.abspath( '/Python33/python' )
-  else:
+    if on_windows():
+        return os.path.abspath('/Python33/python')
     return 'python3'
 
 
 def python():
-  if sys.version_info < ( 3, 0 ) and 'CROSS_PYTHON_TESTS' in os.environ:
-    return python3()
-  else:
+    if sys.version_info < (3, 0) and 'CROSS_PYTHON_TESTS' in os.environ:
+        return python3()
     return sys.executable
 
 
-def with_jedihttp( setup, teardown ):
-  """Decorator which pass the return value of the setup function to the test
-  function and to the teardown function."""
-  def decorate( func ):
-    class Namespace: pass
-    ns = Namespace()
-    ns.jedihttp = None
+def with_jedihttp(setup, teardown):
+    """Decorator which pass the return value of the setup function to the test
+    function and to the teardown function."""
+    def decorate(func):
+        class Namespace:
+            pass
+        ns = Namespace()
+        ns.jedihttp = None
 
-    def test_wrapped(): func( ns.jedihttp )
-    def setup_wrapped(): ns.jedihttp = setup()
-    def teardown_wrapped(): teardown( ns.jedihttp )
+        def test_wrapped():
+            func(ns.jedihttp)
 
-    test_wrapped.__name__ = func.__name__
-    test_wrapped.setup = setup_wrapped
-    test_wrapped.teardown = teardown_wrapped
+        def setup_wrapped():
+            ns.jedihttp = setup()
 
-    return test_wrapped
-  return decorate
+        def teardown_wrapped():
+            teardown(ns.jedihttp)
+
+        test_wrapped.__name__ = func.__name__
+        test_wrapped.setup = setup_wrapped
+        test_wrapped.teardown = teardown_wrapped
+
+        return test_wrapped
+    return decorate
 
 
-def fixture_filepath( *components ):
-  dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-  return os.path.join( dir_of_current_script, 'fixtures', *components )
+def fixture_filepath(*components):
+    dir_of_current_script = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(dir_of_current_script, 'fixtures', *components)
 
 
 # Python 3 complains on the common open(path).read() idiom because the file
 # doesn't get closed.
-def read_file( filepath ):
-  with open( filepath ) as f:
-    return f.read()
+def read_file(filepath):
+    with open(filepath) as f:
+        return f.read()
 
 
 # Creation flag to disable creating a console window on Windows. See
@@ -86,74 +90,73 @@ def read_file( filepath ):
 CREATE_NO_WINDOW = 0x08000000
 
 
-def OnWindows():
-  return sys.platform == 'win32'
+def on_windows():
+    return sys.platform == 'win32'
 
 
 # Convert paths in arguments command to short path ones
-def ConvertArgsToShortPath( args ):
-  def ConvertIfPath( arg ):
-    if os.path.exists( arg ):
-      return GetShortPathName( arg )
-    return arg
+def convert_args_to_short_path(args):
+    def convert_if_path(arg):
+        if os.path.exists(arg):
+            return get_short_path_name(arg)
+        return arg
 
-  if isinstance( args, basestring ):
-    return ConvertIfPath( args )
-  return [ ConvertIfPath( arg ) for arg in args ]
+    if isinstance(args, basestring):
+        return convert_if_path(args)
+    return [convert_if_path(arg) for arg in args]
 
 
 # Get the Windows short path name.
 # Based on http://stackoverflow.com/a/23598461/200291
-def GetShortPathName( path ):
-  from ctypes import windll, wintypes, create_unicode_buffer
+def get_short_path_name(path):
+    from ctypes import windll, wintypes, create_unicode_buffer
 
-  # Set the GetShortPathNameW prototype
-  _GetShortPathNameW = windll.kernel32.GetShortPathNameW
-  _GetShortPathNameW.argtypes = [ wintypes.LPCWSTR,
-                                  wintypes.LPWSTR,
-                                  wintypes.DWORD]
-  _GetShortPathNameW.restype = wintypes.DWORD
+    # Set the GetShortPathNameW prototype
+    _GetShortPathNameW = windll.kernel32.GetShortPathNameW
+    _GetShortPathNameW.argtypes = [wintypes.LPCWSTR,
+                                   wintypes.LPWSTR,
+                                   wintypes.DWORD]
+    _GetShortPathNameW.restype = wintypes.DWORD
 
-  output_buf_size = 0
+    output_buf_size = 0
 
-  while True:
-    output_buf = create_unicode_buffer( output_buf_size )
-    needed = _GetShortPathNameW( path, output_buf, output_buf_size )
-    if output_buf_size >= needed:
-      return output_buf.value
-    else:
-      output_buf_size = needed
+    while True:
+        output_buf = create_unicode_buffer(output_buf_size)
+        needed = _GetShortPathNameW(path, output_buf, output_buf_size)
+        if output_buf_size >= needed:
+            return output_buf.value
+        output_buf_size = needed
 
 
 # A wrapper for subprocess.Popen that fixes quirks on Windows.
-def SafePopen( args, **kwargs ):
-  if OnWindows():
-    # We need this to start the server otherwise bad things happen.
-    # See issue #637.
-    if kwargs.get( 'stdin_windows' ) is subprocess.PIPE:
-      kwargs[ 'stdin' ] = subprocess.PIPE
-    # Do not create a console window
-    kwargs[ 'creationflags' ] = CREATE_NO_WINDOW
-    # Python 2 fails to spawn a process from a command containing unicode
-    # characters on Windows.  See https://bugs.python.org/issue19264 and
-    # http://bugs.python.org/issue1759845.
-    # Since paths are likely to contains such characters, we convert them to
-    # short ones to obtain paths with only ascii characters.
-    args = ConvertArgsToShortPath( args )
+def safe_popen(args, **kwargs):
+    if on_windows():
+        # We need this to start the server otherwise bad things happen.
+        # See https://github.com/Valloric/YouCompleteMe/issues/637.
+        if kwargs.get('stdin_windows') is subprocess.PIPE:
+            kwargs['stdin'] = subprocess.PIPE
+        # Do not create a console window
+        kwargs['creationflags'] = CREATE_NO_WINDOW
+        # Python 2 fails to spawn a process from a command containing unicode
+        # characters on Windows.  See https://bugs.python.org/issue19264 and
+        # http://bugs.python.org/issue1759845.
+        # Since paths are likely to contains such characters, we convert them
+        # to short ones to obtain paths with only ascii characters.
+        args = convert_args_to_short_path(args)
 
-  kwargs.pop( 'stdin_windows', None )
-  return subprocess.Popen( args, **kwargs )
+    kwargs.pop('stdin_windows', None)
+    return subprocess.Popen(args, **kwargs)
 
 
 # From here: http://stackoverflow.com/a/8536476/1672783
-def TerminateProcess( pid ):
-  if OnWindows():
-    import ctypes
-    PROCESS_TERMINATE = 1
-    handle = ctypes.windll.kernel32.OpenProcess( PROCESS_TERMINATE,
-                                                 False,
-                                                 pid )
-    ctypes.windll.kernel32.TerminateProcess( handle, -1 )
-    ctypes.windll.kernel32.CloseHandle( handle )
-  else:
-    os.kill( pid, signal.SIGTERM )
+def terminate_process(pid):
+    if on_windows():
+        import ctypes
+        process_terminate = 1
+        handle = ctypes.windll.kernel32.OpenProcess(process_terminate,
+                                                    False,
+                                                    pid)
+        ctypes.windll.kernel32.TerminateProcess(handle, -1)
+        ctypes.windll.kernel32.CloseHandle(handle)
+    else:
+        os.kill(pid, signal.SIGTERM)
