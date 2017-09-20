@@ -10,3 +10,6 @@
 [submodule "vendor/argparse"]
 	path = vendor/argparse
 	url = https://github.com/bewest/argparse
+[submodule "vendor/parso"]
+	path = vendor/parso
+	url = https://github.com/davidhalter/parso.git
