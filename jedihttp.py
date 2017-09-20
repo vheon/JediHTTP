@@ -20,9 +20,9 @@ import os
 import sys
 from base64 import b64decode
 from argparse import ArgumentParser
-from waitress import serve
 from jedihttp import handlers
 from jedihttp.hmac_plugin import HmacPlugin
+from jedihttp.wsgi_server import StoppableWSGIServer
 
 
 def parse_args():
@@ -75,9 +75,10 @@ def main():
         handlers.app.config['jedihttp.hmac_secret'] = b64decode(hmac_secret)
         handlers.app.install(HmacPlugin())
 
-    serve(handlers.app,
-          host=args.host,
-          port=args.port)
+    handlers.wsgi_server = StoppableWSGIServer(handlers.app,
+                                               host=args.host,
+                                               port=args.port)
+    handlers.wsgi_server.start()
 
 
 if __name__ == "__main__":

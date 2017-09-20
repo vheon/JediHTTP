@@ -24,7 +24,7 @@ from bottle import response, request, Bottle
 from jedihttp import hmaclib
 from jedihttp.compatibility import iteritems
 from jedihttp.settings import default_settings
-from threading import Lock
+from threading import Lock, Thread
 
 try:
     import httplib
@@ -38,6 +38,7 @@ bottle.Request.MEMFILE_MAX = 1000 * 1024
 
 logger = logging.getLogger(__name__)
 app = Bottle(__name__)
+wsgi_server = None
 
 # Jedi is not thread safe.
 jedi_lock = Lock()
@@ -120,6 +121,25 @@ def preload_module():
         with _custom_settings(request_json):
             jedi.preload_module(*request_json['modules'])
     return _json_response(True)
+
+
+@app.post('/shutdown')
+def shutdown():
+    logger.info('received shutdown request')
+    server_shutdown()
+    return _json_response(True)
+
+
+def server_shutdown():
+    def terminate():
+        if wsgi_server:
+            wsgi_server.shutdown()
+
+    # Use a separate thread to let the server send the response before shutting
+    # down.
+    terminator = Thread(target=terminate)
+    terminator.daemon = True
+    terminator.start()
 
 
 def _format_completions(completions):

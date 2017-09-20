@@ -15,10 +15,10 @@
 # https://github.com/Valloric/ycmd/blob/master/ycmd/utils.py
 
 
-import sys
 import os
-import signal
 import subprocess
+import sys
+import time
 
 # python3 compatibility
 try:
@@ -148,15 +148,16 @@ def safe_popen(args, **kwargs):
     return subprocess.Popen(args, **kwargs)
 
 
-# From here: http://stackoverflow.com/a/8536476/1672783
-def terminate_process(pid):
-    if on_windows():
-        import ctypes
-        process_terminate = 1
-        handle = ctypes.windll.kernel32.OpenProcess(process_terminate,
-                                                    False,
-                                                    pid)
-        ctypes.windll.kernel32.TerminateProcess(handle, -1)
-        ctypes.windll.kernel32.CloseHandle(handle)
-    else:
-        os.kill(pid, signal.SIGTERM)
+def process_is_running(handle):
+    return handle.poll() is None
+
+
+def wait_process_shutdown(handle, timeout=5):
+    expiration = time.time() + timeout
+    while True:
+        if time.time() > expiration:
+            raise RuntimeError('Waited for process to be shutdown for {0} '
+                               'seconds, aborting.'.format(timeout))
+        if not process_is_running(handle):
+            return
+        time.sleep(0.1)
