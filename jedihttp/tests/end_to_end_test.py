@@ -12,6 +12,7 @@
 #    limitations under the License.
 
 
+import os
 import requests
 import subprocess
 import sys
@@ -44,8 +45,7 @@ class HmacAuth(requests.auth.AuthBase):
 
 PORT = 50000
 SECRET = 'secret'
-PATH_TO_JEDIHTTP = path.abspath(path.join(path.dirname(__file__),
-                                          '..', '..', 'jedihttp.py'))
+PATH_TO_JEDIHTTP = path.abspath(path.join(path.dirname(__file__), '..'))
 
 
 def wait_until_jedihttp_ready(timeout=5):
@@ -70,9 +70,14 @@ def setup_jedihttp():
                '--port', str(PORT),
                '--log', 'debug',
                '--hmac-file-secret', hmac_file]
+    # Define environment variable to enable subprocesses coverage. See:
+    # http://coverage.readthedocs.io/en/latest/subprocess.html
+    env = os.environ.copy()
+    env['COVERAGE_PROCESS_START'] = '.coveragerc'
     jedihttp = utils.safe_popen(command,
                                 stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT)
+                                stderr=subprocess.STDOUT,
+                                env=env)
     wait_until_jedihttp_ready()
     return jedihttp
 

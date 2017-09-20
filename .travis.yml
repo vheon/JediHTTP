@@ -68,8 +68,9 @@ matrix:
       env: TOXENV=py36-flake8
 
 before_install: git submodule update --init --recursive
-install: ./travis/install.sh
-script: ./travis/run.sh
+install: source travis/install.sh
+script: tox
+after_success: bash <(curl -s https://codecov.io/bash)
 cache:
   directories:
     - $HOME/.pyenv
