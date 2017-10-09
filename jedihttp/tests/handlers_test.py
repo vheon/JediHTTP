@@ -90,7 +90,7 @@ def test_good_gotodefinition():
             'docstring': 'f()\n\nModule method docs\nAre '
                          'dedented, like you might expect',
             'description': 'def f',
-            'full_name': 'goto.f',
+            'full_name': '__main__.f',
             'is_keyword': False,
         },
         {
@@ -102,7 +102,7 @@ def test_good_gotodefinition():
             'column': 6,
             'docstring': 'Class Documentation',
             'description': 'class C',
-            'full_name': 'goto.C',
+            'full_name': '__main__.C',
             'is_keyword': False
         }
     ))
@@ -159,7 +159,7 @@ def test_good_gotoassignment():
         'column': 0,
         'docstring': '',
         'description': 'inception = _list[ 2 ]',
-        'full_name': 'goto.inception',
+        'full_name': '__main__.inception',
         'is_keyword': False
     }))
 
@@ -252,7 +252,7 @@ def test_usages():
             'docstring': 'f()\n\nModule method docs\n'
                          'Are dedented, like you might expect',
             'description': 'def f',
-            'full_name': 'usages.f',
+            'full_name': '__main__.f',
             'is_keyword': False
         },
         {
@@ -262,9 +262,9 @@ def test_usages():
             'in_builtin_module': False,
             'line': 6,
             'column': 4,
-            'description': 'a = f()',
+            'description': 'f',
             'docstring': '',
-            'full_name': 'usages.f',
+            'full_name': '__main__.f',
             'is_keyword': False
         },
         {
@@ -274,9 +274,9 @@ def test_usages():
             'in_builtin_module': False,
             'line': 7,
             'column': 4,
-            'description': 'b = f()',
+            'description': 'f',
             'docstring': '',
-            'full_name': 'usages.f',
+            'full_name': '__main__.f',
             'is_keyword': False
         },
         {
@@ -286,9 +286,9 @@ def test_usages():
             'in_builtin_module': False,
             'line': 8,
             'column': 4,
-            'description': 'c = f()',
+            'description': 'f',
             'docstring': '',
-            'full_name': 'usages.f',
+            'full_name': '__main__.f',
             'is_keyword': False
         }
     ))
@@ -329,7 +329,7 @@ def test_names():
             'column': 0,
             'docstring': '',
             'description': 'CONSTANT = 1',
-            'full_name': 'names.CONSTANT',
+            'full_name': '__main__.CONSTANT',
             'is_keyword': False
         }),
         has_entries({
@@ -341,7 +341,7 @@ def test_names():
             'column': 4,
             'docstring': 'test()\n\n',
             'description': 'def test',
-            'full_name': 'names.test',
+            'full_name': '__main__.test',
             'is_keyword': False
         })
     ))
