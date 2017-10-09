@@ -304,6 +304,16 @@ Response:
 true
 ```
 
+### POST /shutdown
+
+Shut down the server.
+
+Response:
+
+```javascript
+true
+```
+
 ### In case of errors
 
 Response:

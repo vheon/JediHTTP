@@ -24,18 +24,18 @@ def temporary_hmac_secret_file(secret):
     """Helper function for passing the hmac secret when starting a JediHTTP
     server:
 
-      with temporary_hmac_secret_file('mysecret') as hmac_file:
-          jedihttp = subprocess.Popen(['python',
-                                       'jedihttp',
-                                       '--hmac-file-secret', hmac_file.name])
+      hmac_file = temporary_hmac_secret_file('mysecret')
+      jedihttp = subprocess.Popen(['python',
+                                   'jedihttp',
+                                   '--hmac-file-secret', hmac_file])
 
     The JediHTTP Server as soon as it reads the hmac secret will remove the
     file.
     """
-    hmac_file = tempfile.NamedTemporaryFile('w', delete=False)
     encoded_secret = decode_string(b64encode(encode_string(secret)))
-    json.dump({'hmac_secret': encoded_secret}, hmac_file)
-    return hmac_file
+    with tempfile.NamedTemporaryFile('w', delete=False) as hmac_file:
+        json.dump({'hmac_secret': encoded_secret}, hmac_file)
+    return hmac_file.name
 
 
 _HMAC_HEADER = 'x-jedihttp-hmac'

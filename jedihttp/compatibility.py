@@ -64,9 +64,15 @@ try:
     dict.iteritems
 except AttributeError:
     # Python 3
+    def listvalues(dictionary):
+        return list(dictionary.values())
+
     def iteritems(dictionary):
         return iter(dictionary.items())
 else:
     # Python 2
+    def listvalues(dictionary):
+        return dictionary.values()
+
     def iteritems(dictionary):
         return dictionary.iteritems()

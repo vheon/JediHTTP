@@ -12,11 +12,15 @@
 #    limitations under the License.
 
 
-from . import utils
-from .utils import with_jedihttp, py2only, read_file
 import requests
 import subprocess
+import sys
+import time
 from jedihttp import hmaclib
+from jedihttp.compatibility import decode_string
+from jedihttp.tests import utils
+from jedihttp.tests.utils import (process_is_running, py2only, read_file,
+                                  wait_process_shutdown, with_jedihttp)
 from os import path
 from hamcrest import assert_that, equal_to
 
@@ -44,34 +48,53 @@ PATH_TO_JEDIHTTP = path.abspath(path.join(path.dirname(__file__),
                                           '..', '..', 'jedihttp.py'))
 
 
-def wait_for_jedihttp_to_start(jedihttp):
-    line = jedihttp.stdout.readline().decode('utf8')
-    good_start = line.startswith('serving on')
-    reason = jedihttp.stdout.read().decode('utf8') if not good_start else ''
-    return good_start, reason
+def wait_until_jedihttp_ready(timeout=5):
+    expiration = time.time() + timeout
+    while True:
+        if time.time() > expiration:
+            raise RuntimeError('Waited for JediHTTP to be ready '
+                               'for {0} seconds, aborting.'.format(timeout))
+
+        try:
+            if requests.post('http://127.0.0.1:{0}/ready'.format(PORT),
+                             auth=HmacAuth(SECRET)).json():
+                return
+        except requests.exceptions.ConnectionError:
+            time.sleep(0.1)
 
 
 def setup_jedihttp():
-    with hmaclib.temporary_hmac_secret_file(SECRET) as hmac_file:
-        command = [utils.python(),
-                   '-u',  # this flag makes stdout non buffered
-                   PATH_TO_JEDIHTTP,
-                   '--port', str(PORT),
-                   '--hmac-file-secret', hmac_file.name]
-        return utils.safe_popen(command,
-                                stderr=subprocess.STDOUT,
-                                stdout=subprocess.PIPE)
+    hmac_file = hmaclib.temporary_hmac_secret_file(SECRET)
+    command = [utils.python(),
+               PATH_TO_JEDIHTTP,
+               '--port', str(PORT),
+               '--log', 'debug',
+               '--hmac-file-secret', hmac_file]
+    jedihttp = utils.safe_popen(command,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+    wait_until_jedihttp_ready()
+    return jedihttp
 
 
 def teardown_jedihttp(jedihttp):
-    utils.terminate_process(jedihttp.pid)
+    try:
+        requests.post('http://127.0.0.1:{0}/shutdown'.format(PORT),
+                      auth=HmacAuth(SECRET))
+    except requests.exceptions.ConnectionError:
+        pass
+
+    try:
+        wait_process_shutdown(jedihttp)
+    except RuntimeError:
+        jedihttp.terminate()
+
+    stdout, _ = jedihttp.communicate()
+    sys.stdout.write(decode_string(stdout))
 
 
 @with_jedihttp(setup_jedihttp, teardown_jedihttp)
 def test_client_request_without_parameters(jedihttp):
-    good_start, reason = wait_for_jedihttp_to_start(jedihttp)
-    assert_that(good_start, reason)
-
     response = requests.post('http://127.0.0.1:{0}/ready'.format(PORT),
                              auth=HmacAuth(SECRET))
 
@@ -84,9 +107,6 @@ def test_client_request_without_parameters(jedihttp):
 
 @with_jedihttp(setup_jedihttp, teardown_jedihttp)
 def test_client_request_with_parameters(jedihttp):
-    good_start, reason = wait_for_jedihttp_to_start(jedihttp)
-    assert_that(good_start, reason)
-
     filepath = utils.fixture_filepath('goto.py')
     request_data = {
         'source': read_file(filepath),
@@ -109,9 +129,6 @@ def test_client_request_with_parameters(jedihttp):
 
 @with_jedihttp(setup_jedihttp, teardown_jedihttp)
 def test_client_bad_request_with_parameters(jedihttp):
-    good_start, reason = wait_for_jedihttp_to_start(jedihttp)
-    assert_that(good_start, reason)
-
     filepath = utils.fixture_filepath('goto.py')
     request_data = {
         'source': read_file(filepath),
@@ -135,9 +152,6 @@ def test_client_bad_request_with_parameters(jedihttp):
 @py2only
 @with_jedihttp(setup_jedihttp, teardown_jedihttp)
 def test_client_python3_specific_syntax_completion(jedihttp):
-    good_start, reason = wait_for_jedihttp_to_start(jedihttp)
-    assert_that(good_start, reason)
-
     filepath = utils.fixture_filepath('py3.py')
     request_data = {
         'source': read_file(filepath),
@@ -155,3 +169,19 @@ def test_client_python3_specific_syntax_completion(jedihttp):
     hmachelper = hmaclib.JediHTTPHmacHelper(SECRET)
     assert_that(hmachelper.is_response_authenticated(response.headers,
                                                      response.content))
+
+
+@with_jedihttp(setup_jedihttp, teardown_jedihttp)
+def test_client_shutdown(jedihttp):
+    response = requests.post('http://127.0.0.1:{0}/shutdown'.format(PORT),
+                             auth=HmacAuth(SECRET))
+
+    assert_that(response.status_code, equal_to(httplib.OK))
+    assert_that(response.json(), equal_to(True))
+
+    hmachelper = hmaclib.JediHTTPHmacHelper(SECRET)
+    assert_that(hmachelper.is_response_authenticated(response.headers,
+                                                     response.content))
+
+    wait_process_shutdown(jedihttp)
+    assert_that(process_is_running(jedihttp), equal_to(False))
