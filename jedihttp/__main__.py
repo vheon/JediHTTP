@@ -11,13 +11,16 @@
 # See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                '..')))
 from jedihttp import utils
 utils.add_vendor_folder_to_sys_path()
 
 import logging
 import json
-import os
-import sys
 from base64 import b64decode
 from argparse import ArgumentParser
 from jedihttp import handlers

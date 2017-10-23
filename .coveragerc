@@ -1,0 +1,13 @@
+[report]
+omit =
+    */tests/*
+    */__init__.py
+
+[run]
+parallel = True
+source =
+    jedihttp
+
+[paths]
+source =
+    jedihttp/

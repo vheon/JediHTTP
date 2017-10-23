@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/vheon/JediHTTP.svg?branch=master)](https://travis-ci.org/vheon/JediHTTP)
 [![Build status](https://ci.appveyor.com/api/projects/status/28ebc35ocjk9eaew/branch/master?svg=true)](https://ci.appveyor.com/project/vheon/jedihttp/branch/master)
+[![Coverage Status](https://codecov.io/gh/vheon/JediHTTP/branch/coverage/graph/badge.svg)](https://codecov.io/gh/vheon/JediHTTP)
 
 
 A simple http/json wrapper around [jedi][].

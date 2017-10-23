@@ -18,15 +18,20 @@
 set -e
 
 if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
-  # install pyenv
-  if [[ ! -d "$HOME/.pyenv/.git" ]]; then
-    rm -rf ~/.pyenv
-    git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+  # Newer version of RVM fixes a bug that would stop the execution of this
+  # script with the "shell_session_update: command not found" error when
+  # sourcing it.
+  rvm get stable
+
+  # Install pyenv
+  PYENV_ROOT="${HOME}/.pyenv"
+  if [[ ! -d "${PYENV_ROOT}/.git" ]]; then
+    rm -rf ${PYENV_ROOT}
+    git clone https://github.com/yyuu/pyenv.git ${PYENV_ROOT}
   else
-    ( cd ~/.pyenv; git pull; )
+    ( cd ${PYENV_ROOT}; git pull; )
   fi
-  PYENV_ROOT="$HOME/.pyenv"
-  PATH="$PYENV_ROOT/bin:$PATH"
+  PATH="${PYENV_ROOT}/bin:${PATH}"
   eval "$(pyenv init -)"
 
   case "${TOXENV}" in
@@ -49,12 +54,12 @@ if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
       PYTHON_VERSION=3.6.0
       ;;
   esac
-  pyenv install -s "$PYTHON_VERSION"
-  pyenv global "$PYTHON_VERSION"
+  pyenv install -s ${PYTHON_VERSION}
   pyenv rehash
+  pyenv global ${PYTHON_VERSION}
 fi
 
-pip install virtualenv
-virtualenv ~/.venv
-source ~/.venv/bin/activate
-pip install tox
+# coverage.py 4.4 removed the path from the filename attribute in its reports.
+# This leads to incorrect coverage from codecov as it relies on this attribute
+# to find the source file.
+pip install coverage==4.3.4 tox virtualenv

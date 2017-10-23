@@ -92,6 +92,11 @@ install:
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
   - pip install --disable-pip-version-check --user --upgrade pip
-  - pip install tox
+  # coverage.py 4.4 removed the path from the filename attribute in its reports.
+  # This leads to incorrect coverage from codecov as it relies on this attribute
+  # to find the source file.
+  - pip install codecov coverage==4.3.4 tox
 build_script:
   - tox
+after_build:
+  - codecov
