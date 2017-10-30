@@ -25,6 +25,7 @@ from base64 import b64decode
 from argparse import ArgumentParser
 from jedihttp import handlers
 from jedihttp.hmac_plugin import HmacPlugin
+from jedihttp.watchdog_plugin import WatchdogPlugin
 from jedihttp.wsgi_server import StoppableWSGIServer
 
 
@@ -40,6 +41,10 @@ def parse_args():
                         help='log level')
     parser.add_argument('--hmac-file-secret', type=str,
                         help='file containing hmac secret')
+    parser.add_argument('--idle-suicide-seconds', type=int, default=0,
+                        help='number of idle seconds before server shuts down')
+    parser.add_argument('--check-interval-seconds', type=int, default=600,
+                        help='interval in seconds to check server inactivity')
     return parser.parse_args()
 
 
@@ -77,6 +82,9 @@ def main():
         hmac_secret = get_secret_from_temp_file(args.hmac_file_secret)
         handlers.app.config['jedihttp.hmac_secret'] = b64decode(hmac_secret)
         handlers.app.install(HmacPlugin())
+
+    handlers.app.install(WatchdogPlugin(args.idle_suicide_seconds,
+                                        args.check_interval_seconds))
 
     handlers.wsgi_server = StoppableWSGIServer(handlers.app,
                                                host=args.host,
