@@ -18,10 +18,10 @@
 set -e
 
 if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
-  # Newer version of RVM fixes a bug that would stop the execution of this
-  # script with the "shell_session_update: command not found" error when
-  # sourcing it.
-  rvm get stable
+  # RVM overrides the cd, popd, and pushd shell commands, causing the
+  # "shell_session_update: command not found" error on macOS when executing those
+  # commands.
+  unset -f cd popd pushd
 
   # Install pyenv
   PYENV_ROOT="${HOME}/.pyenv"
